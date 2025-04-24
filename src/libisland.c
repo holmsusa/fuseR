@@ -1,3 +1,7 @@
+/**
+ * @file libisland.c
+ * @brief Implementation of binomial clustering, sorting, and cutting of tree.
+ */
 
 #include "libisland.h"
 #include <assert.h>
@@ -5,60 +9,29 @@
 #include "heap.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <alloca.h>
 
 
-
-int
-add(int a, int b) {
-	return a + b;
-}
-
-int
-subtract(int a, int b) {
-	return a - b;
-}
-
-
-
-
-
+#define LOG_PI (1.1447298858494001638774761886452324688434600830078125)
 
 double
-bino_div(double x, double y)
-{
-	if (y > 0.)
-		return x / y;
-	else
-		return 0.5;
+bino_div(double x, double y) {
+    return (y > 0.) ? x / y : 0.5;
 }
 
 double
-bino_div_id(int x, double y)
-{
-	if (!y == 0)
-		return (double)x / y;
-	else
-		return 0.5;
-}
-
-
-
-double
-bino_xlogy(double x, double y)
-{
-	if (y > 0.)
-		return x * log(y);
-	else
-		return 0.;
+bino_div_id(int x, double y) {
+    return (y != 0) ? (double)x / y : 0.5;
 }
 
 double
-bino_xlogy_id(int x, double y)
-{
-	if (!(y == 0))
-		return x * log(y);
-	else
-		return 0;
+bino_xlogy(double x, double y) {
+    return (y > 0.) ? x * log(y) : 0.;
+}
+
+double
+bino_xlogy_id(int x, double y) {
+    return (y != 0) ? x * log(y) : 0;
 }
 
 double
@@ -66,13 +39,9 @@ cost(double k0, double k1)
 {
 
 	// Return 0 if k0 and or k1 are NaN
-	if(k0 < 0) {
-		return 0;
-	}
-
-	if(k1 < 0) {
-		return 0;
-	}
+	if (k0 < 0 || k1 < 0) {
+        return 0;
+    }
 
 	// Else compute likelihood
 	double p;
@@ -81,25 +50,18 @@ cost(double k0, double k1)
 	return (-(bino_xlogy(k1, p) + bino_xlogy(k0, 1.-p)));
 }
 
-
 double
-nLLR(const data_elem_t *K1, const data_elem_t *K2, double LOG_L1, double LOG_L2, size_t n) {
+nLLR(const data_elem_t *LHC, const data_elem_t *RHC, double LOGL_LHC, double LOGL_RHC, size_t num_of_samples) {
 	size_t j;
-	double res = 0;
+	double logl = 0;
 
-
-/* #pragma omp parallel for schedule(static) reduction(+: res) */
-	for( j = 0; j < n; ++j) {
-
-		// Replace NaN with 0
-		// res += cost(fmax(K1[j].k0,0) + fmax(K2[j].k0,0), fmax(K1[j].k1,0) + fmax(K2[j].k1,0)) - (cost(K1[j].k0, K1[j].k1) + cost(K2[j].k0, K2[j].k1));
-		res += cost(fmax(K1[j].k0,0) + fmax(K2[j].k0,0), fmax(K1[j].k1,0) + fmax(K2[j].k1,0)) ;
+	// Looping trough LHC and RHC to compute combined likelihoood
+	for( j = 0; j < num_of_samples; ++j) {
+		logl += cost(fmax(LHC[j].k0,0) + fmax(RHC[j].k0,0), fmax(LHC[j].k1,0) + fmax(RHC[j].k1,0)) ; // fmax ensures NaN=-1 values are not included
 	}
 
-	return res - (LOG_L1 + LOG_L2) ;
+	return logl - (LOGL_LHC + LOGL_RHC) ;
 }
-
-#define LOG_PI (1.1447298858494001638774761886452324688434600830078125)
 
 static
 double 
@@ -114,84 +76,84 @@ dist(const int chr1, const int chr2, const int pos1, const int pos2) {
 }
 
 distance_t 
-merged_cost(const data_elem_t *K1, const data_elem_t *K2, double LOG_L1, double LOG_L2, const int chr1, const int chr2, const int pos1, const int pos2, size_t n) {
-	distance_t D;
-
-	D.nllr = nLLR(K1, K2, LOG_L1, LOG_L2, n);  
-
-	D.d = dist(chr1, chr2, pos1, pos2);
-	return D;
+merged_cost(const data_elem_t *LHC, const data_elem_t *RHC, double LOGL_LHC, double LOGL_RHC, const int chrL, const int chrR, const int posL, const int posR, size_t num_of_samples) {
+	distance_t distance;
+	distance.nllr = nLLR(LHC, RHC, LOGL_LHC, LOGL_RHC, num_of_samples);  
+	distance.d = dist(chrL, chrR , posL, posR);
+	return distance;
 }
 
-
 void
-init_state(distance_t *D, double *L, size_t *PL, size_t *PR, const data_elem_t *K, double *LOG_L, double *tracked_cost, const int *chr, const int *pos, size_t m, size_t n)
+init_state(distance_t *distance, double *labels, size_t *l_neighbor, size_t *r_neighbor, const data_elem_t *counts, double *logl, double *tracked_cost, const int *chr, const int *pos, size_t num_of_sites, size_t num_of_samples)
 {
 	size_t I_NIL, i, j;
 
-	assert(m > 0);
+	/* Assert data is not empty */
+	assert(num_of_sites > 0);
 
 	/* Get invalid index */
-	I_NIL = m;
+	I_NIL = num_of_sites;
 
-	for(i = 0; i<m; ++i) {
-		LOG_L[i] = 0;
-		for (j = 0; j < n; ++j ) {
-			LOG_L[i] += cost(K[n*i + j].k0, K[n*i + j].k1);
+	/* Compute binomial log-likelihoods for each site */
+	for(i = 0; i<num_of_sites; ++i) {
+		logl[i] = 0;
+		for (j = 0; j < num_of_samples; ++j ) {
+			logl[i] += cost(counts[num_of_samples*i + j].k0, counts[num_of_samples*i + j].k1);
 		}
 	}
-	
 
-	/* Set up valid data */
-	for (i = 0; i < m-1; ++i) {
-		D[i] = merged_cost(&K[n*i], &K[n*(i+1)], LOG_L[i], LOG_L[i+1], chr[i], chr[i+1], pos[i], pos[i+1], n);
-		PL[i+1] = i;
-		PR[i] = i+1;
+	/* Set up valid distances, fill in left and right neighbors */
+	for (i = 0; i < num_of_sites-1; ++i) {
+		distance[i] = merged_cost(&counts[num_of_samples*i], &counts[num_of_samples*(i+1)], logl[i], logl[i+1], chr[i], chr[i+1], pos[i], pos[i+1], num_of_samples);
+		l_neighbor[i+1] = i;
+		r_neighbor[i] = i+1;
 	}
 
-	/* SEt up sentinel */
+	/* Set up extremes */
 	{
-		D[m-1].d = INFINITY;
-		D[m-1].nllr = INFINITY;
-		PL[0] = I_NIL;
-		PR[m-1] = I_NIL;
+		/* Nothing right of the rightmost point */
+		distance[num_of_sites-1].d = INFINITY; 
+		distance[num_of_sites-1].nllr = INFINITY;
 
-		D[m].d = INFINITY;
-		D[m].nllr = INFINITY; /* nil slot */
+		/* Extremes don't have neighbors */
+		l_neighbor[0] = I_NIL;
+		r_neighbor[num_of_sites-1] = I_NIL;
+
+		/* Placeholder slot to the furthest right */
+		distance[num_of_sites].d = INFINITY;
+		distance[num_of_sites].nllr = INFINITY; /* nil slot */
 	}
 	
-
 	/* Set up labels */
-	for (i = 0; i < m; ++i) {
-		L[i] = -(double)(i+1);
+	for (i = 0; i < num_of_sites; ++i) {
+		labels[i] = -(double)(i+1);
 		tracked_cost[i] = 0;
 	}
 		
 }
 
 size_t 
-new_pair(size_t p, distance_t *D, size_t *PL, size_t *PR, size_t m)
+new_pair(size_t current, distance_t *distance, size_t *l_neighbor, size_t *r_neighbor)
 {
+	double current_pair, best_pair;
 
-	double v, w;
-
-	(void)m;
-	if ( (D[PL[p]].d + D[PL[p]].nllr) < (D[PR[p]].d + D[PR[p]].nllr) ) {
+	/* Do we go left or right?*/
+	if ( (distance[l_neighbor[current]].d + distance[l_neighbor[current]].nllr) < (distance[r_neighbor[current]].d + distance[r_neighbor[current]].nllr) ) {
 		/* Scan left */
-		v = D[p].d + D[p].nllr;
-		while ( (w = (D[PL[p]].d + D[PL[p]].nllr )) < v) {
-			p = PL[p];
-			v = w;
+		current_pair = distance[current].d + distance[current].nllr;
+		while ( (best_pair = (distance[l_neighbor[current]].d + distance[l_neighbor[current]].nllr )) < current_pair) {
+			current = l_neighbor[current];
+			current_pair = best_pair;
 		}
 	} else {
 		/* Scan right */ 
-		v = D[p].d + D[p].nllr;
-		while ( (w = (D[PR[p]].d + D[PR[p]].nllr)) < v) {
-			p = PR[p];
-			v = w;
+		current_pair = distance[current].d + distance[current].nllr;
+		while ( (best_pair = (distance[r_neighbor[current]].d + distance[r_neighbor[current]].nllr)) < current_pair) {
+			current = r_neighbor[current];
+			current_pair = best_pair;
 		}
 	}
-	return p;
+	return current;
 }
 
 double
@@ -205,36 +167,35 @@ max_d(double A, double B) {
 	return A;
 }
 
-
 void
-update_K(data_elem_t *K, double *LOG_L, size_t p1, size_t p2, size_t n) {
+update_counts(data_elem_t *counts, double *logl, size_t LHC, size_t RHC, size_t num_of_samples) {
 	size_t j;
 
-	for (j = 0; j < n; j++) {
+	for (j = 0; j < num_of_samples; j++) {
 		double k0, k1, l0, l1;
 
+		// TODO
 		/* NaNs are transformed to -2147483648. So, if a k-value is <0, just add 0. Otherwise, add the value itself*/
 		
-		k0 = max_d(K[n*p1 + j].k0, 0);
-		k1 = max_d(K[n*p1 + j].k1, 0);
-		l0 = max_d(K[n*p2 + j].k0, 0);
-		l1 = max_d(K[n*p2 + j].k1, 0);
+		k0 = max_d(counts[num_of_samples*LHC + j].k0, 0); // Unmethylated counts in LHC
+		k1 = max_d(counts[num_of_samples*LHC + j].k1, 0); // Methylated counts in LHC
+		l0 = max_d(counts[num_of_samples*RHC + j].k0, 0); // Unmethylated counts in RHC
+		l1 = max_d(counts[num_of_samples*RHC + j].k1, 0); // Methylated coutns in RHC
 
-
-		K[n*p1 + j].k0 = k0 + l0;
-		K[n*p1 + j].k1 = k1 + l1;
+		/* New counts are written into index of the lefthand cluster */
+		counts[num_of_samples*LHC + j].k0 = k0 + l0; 
+		counts[num_of_samples*LHC + j].k1 = k1 + l1;
 	}
-	LOG_L[p1] = LOG_L[p1] + LOG_L[p2];
+
+	/* Sum of likelihoods for the cluster is updated*/
+	logl[LHC] = logl[LHC] + logl[RHC];
 }
-
-
-
 
 #define double_LESS(x, y, H)  ( (H)[((x))] < (H)[((y))] )
 
 struct cookie {
-	double *H;
-	const double *left;
+	double *H; // Height
+	const double *left; // Label of leftmost point in cluster
 };
 
 static
@@ -253,94 +214,58 @@ larger(size_t x, size_t y, const struct cookie *cookie)
 	return 0;
 }
 
-
 HEAP_DEFINE(heap_size_t, size_t, size_t, larger, const struct cookie *)
 
 size_t 
-sort_tree_size(size_t m)
+sort_tree_size(size_t nrow_tree)
 {
-    return m + m + m + m;
-}
-
-#include <stdio.h>
-#include <alloca.h>
-#include <stdlib.h>
-
-
-void
-dump_tree(const double *Z, size_t m1)
-{
-	fprintf(stderr, "%s\t%s\t%s\n", "merge.1", "merge.2", "height");
-	for (size_t i = 0; i < m1; ++i)
-		fprintf(stderr, "%f" "\t" "%f" "\t" "%g" "\n", Z[0*m1+i], Z[1*m1+i], Z[2*m1+i]);
+    return nrow_tree + nrow_tree + nrow_tree + nrow_tree + nrow_tree;
 }
 
 void
-sort_tree(double *Z_new, void *scratch, const double *Z, size_t m)
+sort_tree(double *tree_sorted, void *scratch, const double *tree_unsorted, size_t nrow_tree)
 {
 	size_t *perm, r, size, p, j, *inv_perm, *heap;
 	double q1, q2, *left;
 	struct cookie cookie;
 
-	// int * used ;
-	// used = (int *)alloca( m * sizeof(*used));
-	// {size_t i;
-	// for (i = 0 ; i < m ; ++i)
-	// 	used[i] = 0;
-	// }
-
 	/* Allocate memory */
-    left = (double *)scratch;
-    perm = (size_t *)&left[m];
-    inv_perm = (size_t *)&perm[m];
-    heap = (size_t *)&inv_perm[m];
+    left = (double *)scratch; // Leftmost point in every cluster
+    perm = (size_t *)&left[nrow_tree]; // id of tree_sorted in tree_unsorted
+    inv_perm = (size_t *)&perm[nrow_tree]; // id of tree_unsorted in tree_sorted
+    heap = (size_t *)&inv_perm[nrow_tree]; // heap for storing points under consideration
 	
-	/* Get the leftmost data point in every cluster */
-	for( j = 0; j < m; ++j) {
-		left[j] = Z[0*m + j];
+	/* Get the leftmost data point in every cluster from column 0 */
+	for( j = 0; j < nrow_tree; ++j) {
+		left[j] = tree_unsorted[0*nrow_tree + j];
 
+		/* If labels are >0, they are row indices. Starting from 1 in R and from 0 in C, so adding -1*/
 		if (left[j] > 0) {
-			left[j] = left[(size_t)left[j]-1];
+			left[j] = left[(size_t)left[j]-1];  
 		} 
 	}
 
 	/* Height */
 	double *H;
-	H = malloc(sizeof(*H) * (m));
+	H = malloc(sizeof(*H) * (nrow_tree));
 
-	for( j=0; j<m; ++j) {
-		H[j] = Z[2*m + j] + Z[3*m + j];
+	/* Sorting based on sum of columns 2 and 3*/
+	for( j=0; j<nrow_tree; ++j) {
+		H[j] = tree_unsorted[3*nrow_tree + j] + tree_unsorted[4*nrow_tree + j];
 	}
 
 	cookie.H = &H[0];
 	cookie.left = left;
 	
-
-	size = 0;
+	size = 0; // Initial size of heap is 0
 	
 	/* Put root to heap */
-	*heap = m-1;
+	*heap = nrow_tree-1;
 	++size;
-// used[heap[size]]++;
 	heap_size_t_make_heap(heap, size, &cookie);
 	
-
-	for ( r = m ; r-- > 0; ) {    
-
-		// if (size == 0)
-		// {
-		// 		fprintf(stderr, "FALIL\n");
-		// 	for (size_t i = 0; i < m ; ++i) {
-		// 		if (used[i] != 1) {
-		// 			fprintf(stderr, "used[%zu] = %d\n", i, used[i]);
-
-		// 		dump_tree(Z, m);
-		// 			abort();
-		// 		}
-		// 	}
-
-		// }
-
+	for ( r = nrow_tree ; r-- > 0; ) {  
+		
 		/* pop best from heap */
 		p = heap[0];
 	   	heap_size_t_pop_heap( heap, size, &cookie);
@@ -350,211 +275,166 @@ sort_tree(double *Z_new, void *scratch, const double *Z, size_t m)
 		perm[r] = p;
 
 		/* get children */
-		q1 = Z[0*m + p];
-		q2 = Z[1*m + p];
+		q1 = tree_unsorted[0*nrow_tree + p];
+		q2 = tree_unsorted[1*nrow_tree + p];
 		
-		/* if not leaf, add to stack */
+		/* if not leaf, add to heap */
 		if (q1 > 0) {
 			heap[size] = (size_t)q1 - 1;
-// used[heap[size]]++;
 			++size;
 	 	 	heap_size_t_push_heap(heap, size, &cookie);  /* O(log n ) */
 		}
 			
 		if (q2 > 0) {
 			heap[size] = (size_t)q2 - 1;
-// used[heap[size]]++;
 			++size;
 	 	 	heap_size_t_push_heap(heap, size, &cookie);  /* O(log n ) */
 		}
 	}
 
-	for( j = 0; j < m; j++) {
+	/* Filling sorted tree */
+	for( j = 0; j < nrow_tree; j++) {
 		inv_perm[perm[j]] = j;
 
-		Z_new[0*m + j] = Z[0*m + perm[j]];
-		Z_new[1*m + j] = Z[1*m + perm[j]];
-		Z_new[2*m + j] = Z[2*m + perm[j]];
-		Z_new[3*m + j] = Z[3*m + perm[j]];
+		tree_sorted[0*nrow_tree + j] = tree_unsorted[0*nrow_tree + perm[j]];
+		tree_sorted[1*nrow_tree + j] = tree_unsorted[1*nrow_tree + perm[j]];
+		tree_sorted[2*nrow_tree + j] = tree_unsorted[2*nrow_tree + perm[j]];
+		tree_sorted[3*nrow_tree + j] = tree_unsorted[3*nrow_tree + perm[j]];
+		tree_sorted[4*nrow_tree + j] = tree_unsorted[4*nrow_tree + perm[j]];
 	}
 	
-	for ( j = 0; j < m; ++j) {
-		if (Z_new[0*m + j] > 0) {
-			Z_new[0*m + j] = (double)(inv_perm[(size_t)Z_new[0*m + j] - 1] + 1);
+	/* If labels are positive they indicate which row the merge happended on. This changes as well. In R from 1, C from 0. */
+	for ( j = 0; j < nrow_tree; ++j) {
+		if (tree_sorted[0*nrow_tree + j] > 0) {
+			tree_sorted[0*nrow_tree + j] = (double)(inv_perm[(size_t)tree_sorted[0*nrow_tree + j] - 1] + 1);
 		}
-		if (Z_new[1*m + j] > 0) {
-			Z_new[1*m + j] = (double)(inv_perm[(size_t)Z_new[1*m + j] - 1] + 1);
-		}
-	}
-}
-
-size_t 
-island_cluster_size(size_t m, size_t n)
-{
-    return m+1 + m + 2*m*n + m + m;
-}
-
-double
-logl_for_clust(size_t *clust, size_t value, double *LOG_L, size_t m)
-{
-	size_t i;
-	double res;
-
-	res = 0;
-
-	for(i = 0; i < m; ++i) {
-		if (clust[i] == value) {
-			res += LOG_L[i];
+		if (tree_sorted[1*nrow_tree + j] > 0) {
+			tree_sorted[1*nrow_tree + j] = (double)(inv_perm[(size_t)tree_sorted[1*nrow_tree + j] - 1] + 1);
 		}
 	}
-
-	return res;
 }
 
-// void
-// island_cluster(void *scratch, double *Z, const int *K0, const int *K1, const int *chr, const int *pos, size_t m, size_t n) <-- Handling memory allocations inside function
 void
-island_cluster(double *Z, const int *K0, const int *K1, const int *chr, const int *pos, size_t m, size_t n)
+island_cluster(double *tree, const int *K0, const int *K1, const int *chr, const int *pos, size_t num_of_sites, size_t num_of_samples)
 {
-	/* Function that takes as input K0 and K1 and performs a hierarchical clustering. Output tree is unsorted, needs to be sorted with sort_tree().
+	/* Initializing helper variables */
+	distance_t *distance; // vector for storing distances between CpG-sites
+	double *labels; // vector for storing labels of CpG-sites or clusters. L < 0 means single CpG site, L > 0 means cluster and points to row
+	double *logl; // vector holding total binomial log-likelihood of each cluster
+	double *tracked_cost; // vector holding changes in total likelihood of data when each cluster was formed
+	double new_clust_logl; // For holding log-likelihood of new cluster
+	size_t *l_neighbor, *r_neighbor; // vectors that point to the index of the left or right neighbor (these change as points merge into clusters).
+	size_t i, j; // counters
+	size_t I_NO; // invalid index (rightmost)
+	size_t LHC, RHC; // Lefthand cluster and righthand cluster to merge
+	data_elem_t *counts; // matrix holding the values of K0 and K1 at every CpG-site for every sample as doubles
 	
-	Input: 
-	double *Z: vector for storing results, 
-	const int* K0, K1: input matrices with count values (samples X CpG-sites), 
-	const int* chr: vector telling which chromosome each CpG-site belongs to, 
-	const int *pos: vector telling the genomic coordinate of each CpG-site
-	size_t m, n: number of CpG-sites (rows) and samples (cols) in K0 and K1
-	
-	Output:
-	double Z*: vector holding results. Every row is a merge, first two columns holds identifiers of merged points, third column holds value of log-likelihood function for the merge.
-	*/
-
-
-
-
-	/* Initializing helper variables
-	double *D: vector for storing distances between CpG-sites
-	double *L: vector for storing labels of CpG-sites or clusters. L < 0 means single CpG site, L > 0 means cluster. 
-	size_t *PL, *PR: vectors that points to the index of the left or right neighbour (these change as points merge into clusters).
-	size_t i, j: used for indexing 
-	size_t I_NO: invalid index
-	size_t p1, p2: indices of points currently being clustered
-	data_elem_t K: matrix holdinf the values of K0 and K1 at every CpG-site for every sample as doubles.*/
-	double *L, *LOG_L, *tracked_cost;
-	size_t *PL, *PR, i, j, I_NO, p1, p2;
-	data_elem_t *K;
-	distance_t *D;
 
 	/* Check empty problem */
-	if (!(m > 0) || !(n > 0))
+	if (!(num_of_sites > 0) || !(num_of_samples > 0))
 		return;
 
-	/* Invalid index */
-	I_NO = m; 
+	/* Invalid index is rightmost */
+	I_NO = num_of_sites; 
 
 	/* Allocating memory */
-	D = malloc(sizeof(*D) * (m+1));
-	L = malloc(sizeof(*L) * m);
-	K = malloc(sizeof(*K) * m*n);
-	PL = malloc(sizeof(*PL) * m);
-	PR = malloc(sizeof(*PR) * m);
-	LOG_L = malloc(sizeof(*LOG_L) * m);
-	tracked_cost = malloc(sizeof(*tracked_cost) * m);
+	distance = malloc(sizeof(*distance) * (num_of_sites+1));
+	labels = malloc(sizeof(*labels) * num_of_sites);
+	logl = malloc(sizeof(*logl) * num_of_sites);
+	counts = malloc(sizeof(*counts) * num_of_sites*num_of_samples);
+	l_neighbor = malloc(sizeof(*l_neighbor) * num_of_sites);
+	r_neighbor = malloc(sizeof(*r_neighbor) * num_of_sites);
+	tracked_cost = malloc(sizeof(*tracked_cost) * num_of_sites);
 
-	// TODO:
-	// 	- assert pointers are not NULL
-	// 	- assert stack is not overflowing/not using too much memory etc
-
-
-	/* R matrices need to be transposed for indexing to be correct. Transposing K0 and K1 and copying to K. Also avoid manipulation of R object within function. */
-	for (j = 0; j < n; ++j) {
-		for (i = 0; i < m; ++i) {
-			K[ i*n + j ].k0 = K0[ i + j*m ]; 
-			K[ i*n + j ].k1 = K1[ i + j*m ];
+	/* R matrices need to be transposed for indexing to be correct. Transposing K0 and K1 and copying to counts.k0 and counts.k1. */
+	for (j = 0; j < num_of_samples; ++j) {
+		for (i = 0; i < num_of_sites; ++i) {
+			counts[ i*num_of_samples + j ].k0 = K0[ i + j*num_of_sites ]; 
+			counts[ i*num_of_samples + j ].k1 = K1[ i + j*num_of_sites ];
 		}
 	}
 	
 	/* Initializing rest of variables */
-	init_state( D, L, PL, PR, K, LOG_L, tracked_cost, chr, pos, m, n );
+	init_state( distance, labels, l_neighbor, r_neighbor, counts, logl, tracked_cost, chr, pos, num_of_sites, num_of_samples );
 	
-	/* Boot current pointer */
-	p1 = 0; 
+	/* Starting from left */
+	LHC = 0; 
 
 	/* Cluster loop */
-	for (j = 0; j < m-1; ++j) {
+	for (j = 0; j < num_of_sites-1; ++j) {
 
+		// Resetting
+		new_clust_logl = 0;
 
-		//printf("%lu / %lu\n", j, m-2);
-		/* Scanning to find new pair p1 and p2 to merge. p2 is to the right of p1*/
-		p1 = new_pair(p1, D, PL, PR, m);
-		p2 = PR[p1];
+		/* Scanning to find new pair LHC and RHC to merge. RHC is to the right of LHC*/
+		LHC = new_pair(LHC, distance, l_neighbor, r_neighbor);
+		RHC = r_neighbor[LHC];
 
-		/* Record merge into Z */
-		Z[0*(m-1) + j] = L[p1];
-		Z[1*(m-1) + j] = L[p2];
-		Z[2*(m-1) + j] = D[p1].nllr - tracked_cost[p1] - tracked_cost[p2];
-		Z[3*(m-1) + j] = D[p1].d;
+		/* Compute the total sum of likelihoods of merge and add to tree */ 
+		for (i = 0; i < num_of_samples; ++i ) {
+			 new_clust_logl += cost(counts[num_of_samples*LHC + i].k0 + counts[num_of_samples*RHC + i].k0, counts[num_of_samples*LHC + i].k1 + counts[num_of_samples*RHC + i].k1);
+		}
 
-		/* Update tracked cost*/
-		tracked_cost[p1] = D[p1].nllr;
+		/* Record merge into tree */
+		tree[0*(num_of_sites-1) + j] = labels[LHC]; // label of first merged point
+		tree[1*(num_of_sites-1) + j] = labels[RHC]; // label of second merged point
+		tree[2*(num_of_sites-1) + j] = distance[LHC].nllr - tracked_cost[LHC] - tracked_cost[RHC]; // change in total likelihood of data
+		tree[3*(num_of_sites-1) + j] = new_clust_logl - logl[LHC] - logl[RHC]; // total likelihood of all points in merge
+		tree[4*(num_of_sites-1) + j] = distance[LHC].d; // genomic distance penalty
+
+		/* Update tracked cost */
+		tracked_cost[LHC] = distance[LHC].nllr;
 
 		/* Update labels. 
-		L[p1] is j+1, that is, the row of the merge (R indexing starting from 1 and not 0). 
-		L[p2] is 0 as it can no longer be merged with its left neighbour. */
-		L[p1] = j+1;
-#ifndef NDEBUG
-		L[p2] = 0;
-#endif
+		L[LHC] is j+1, that is, the row of the merge (R indexing starting from 1 and not 0). 
+		L[RHC] is 0 as it can no longer be merged with its left neighbour. */
+		labels[LHC] = j+1;
+		labels[RHC] = 0;
 
 		/* Update pointers.
-		Left and right neighbours of new cluster are assigned to p1. Also the neighbours neighbour information needs updating, unless new right neighbour of cluster is end of vector (invalid index I_NO). 
-		p2 is used and assigned to be */
-		PR[p1] = PR[p2];
-		if (PR[p1] != I_NO)
-			PL[PR[p1]] = p1;
-#if 1
-		PL[p2] = I_NO;
-		PR[p2] = I_NO;
-#endif
+		Left and right neighbors of new cluster are assigned to LHC. 
+		Also the neighbours neighbor information needs updating, unless new right neighbor of cluster is end of vector (invalid index I_NO). 
+		RHC is used and assigned to be invalid.*/
+		r_neighbor[LHC] = r_neighbor[RHC];
+		if (r_neighbor[LHC] != I_NO)
+			l_neighbor[r_neighbor[LHC]] = LHC;
 
-		/* Update data.
-		K now holds the sum of all merged points */
-		update_K(K, LOG_L, p1, p2, n);
+		l_neighbor[RHC] = I_NO;
+		r_neighbor[RHC] = I_NO;
+
+		/* Update data: counts[LHC] now holds the sum of all merged points */
+		update_counts(counts, logl, LHC, RHC, num_of_samples);
 
 		/* Update distances */
-		if ( PL[p1] != I_NO) {
-			D[PL[p1]] = merged_cost( &K[n*PL[p1]], &K[n*p1], LOG_L[PL[p1]], LOG_L[p1], chr[PL[p1]], chr[p1], pos[p1-1], pos[p1], n);
+		if ( l_neighbor[LHC] != I_NO) {
+			distance[l_neighbor[LHC]] = merged_cost( &counts[num_of_samples*l_neighbor[LHC]], &counts[num_of_samples*LHC], logl[l_neighbor[LHC]], logl[LHC], chr[l_neighbor[LHC]], chr[LHC], pos[LHC-1], pos[LHC], num_of_samples);
 			
 		}
-		if ( PR[p1] != I_NO) {
-			D[p1] = merged_cost(&K[n*p1], &K[n*PR[p1]], LOG_L[p1], LOG_L[PR[p1]], chr[p1], chr[PR[p1]], pos[PR[p1]-1], pos[PR[p1]], n);
+		if ( r_neighbor[LHC] != I_NO) {
+			distance[LHC] = merged_cost(&counts[num_of_samples*LHC], &counts[num_of_samples*r_neighbor[LHC]], logl[LHC], logl[r_neighbor[LHC]], chr[LHC], chr[r_neighbor[LHC]], pos[r_neighbor[LHC]-1], pos[r_neighbor[LHC]], num_of_samples);
 			
 
 		} else {
-			D[p1].d = INFINITY; // TODO: Smoother way to do this?
-			D[p1].nllr = INFINITY;
+			distance[LHC].d = INFINITY; 
+			distance[LHC].nllr = INFINITY;
 		}
-#ifndef NDEBUG
-			D[p2].d = INFINITY;
-			D[p2].nllr = INFINITY;
-#endif
+			distance[RHC].d = INFINITY;
+			distance[RHC].nllr = INFINITY;
 
-		if (PR[p1] == I_NO)
-			p1 = PL[p1];
+		if (r_neighbor[LHC] == I_NO)
+			LHC = l_neighbor[LHC];
 	}
 
 
 	/* Freeing memory */
-	free(D);
-	free(L);
-	free(K);
-	free(PL);
-	free(PR);
-	free(LOG_L);
+	free(distance);
+	free(labels);
+	free(logl);
 	free(tracked_cost);
-
+	free(l_neighbor);
+	free(r_neighbor);
+	free(counts);
 }
-
 
 static
 size_t
@@ -568,6 +448,7 @@ rlabel2linear(double L, size_t N)
 		return (size_t)( L - 1. ) + N;
 }
 
+// TODO
 void
 cutree(size_t *L, const double *Z, size_t k, size_t n)
 {
