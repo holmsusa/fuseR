@@ -2,6 +2,13 @@
 #define LIBFUSE_H_
 
 #include <stddef.h> 
+#include <math.h>  // For NAN
+
+#define FUSE_NA_DOUBLE NAN
+
+static inline int is_na_double(double x) {
+    return isnan(x);
+}
 
 typedef struct {
 	double k0, k1;
@@ -190,14 +197,13 @@ void sort_tree(double *Z_new, void *scratch, const double *Z, size_t m);
  *                     - Column 2: Change in total likelihood for the merge.
  *                     - Column 3: Total likelihood for the cluster.
  *                     - Column 4: Penalty for genomic distance between points.
- * @param[in] K0 Matrix (num_of_sites × num_of_samples) containing unmethylated count values for each CpG site.
- * @param[in] K1 Matrix (num_of_sites × num_of_samples) containing methylated count values for each CpG site.
+ * @param[in] counts Structure holding count matrix (num_of_sites × num_of_samples) containing unmethylated (k0) and methylated (k1) count values for each CpG site.
  * @param[in] chr Array of size `m`, indicating the chromosome each CpG site belongs to.
  * @param[in] pos Array of size `m`, indicating the genomic coordinate of each CpG site.
  * @param[in] num_of_sites Number of CpG sites (rows in `K0` and `K1`).
  * @param[in] num_of_samples Number of samples (columns in `K0` and `K1`).
  */
-void fuse_cluster(double *tree, const int *K0, const int *K1, const int *chr, const int *pos, size_t num_of_sites, size_t num_of_samples);
+void fuse_cluster(double *tree, data_elem_t *counts, const int *chr, const int *pos, size_t num_of_sites, size_t num_of_samples);
 
 /**
  * @brief Computes Pearson correlation row sums.

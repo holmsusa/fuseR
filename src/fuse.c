@@ -10,6 +10,7 @@
 
 
 #include <Rinternals.h>
+#include <R.h>
 #include <assert.h>
 #include "libfuse.h"
 
@@ -51,6 +52,7 @@ sort_tree_R(SEXP tree_R)
 	return tree_sorted_R;
 }
 
+
 /**
  * @brief Performs hierarchical clustering on input matrices.
  * 
@@ -68,35 +70,43 @@ sort_tree_R(SEXP tree_R)
 SEXP 
 fuse_cluster_R(SEXP K0_R, SEXP K1_R, SEXP CHR_R, SEXP POS_R)
 {
-	int nrow, ncol;
-	SEXP tree_R;
+    int nrow = nrows(K0_R);
+    int ncol = ncols(K0_R);
 
-	/* Check type of input */
-	if (!(isInteger(K0_R)))
-		error("'%s' must be an integer array", "K0");
-	if (!(isInteger(K1_R)))
-		error("'%s' must be an integer array", "K1");
+    /* Validate input */
+    if (!isInteger(K0_R) || !isInteger(K1_R))
+        error("'K0' and 'K1' must be integer matrices");
 
-	/* Get dimensions */
-	nrow = nrows(K0_R);
-	ncol = ncols(K0_R);
+    if (nrows(K1_R) != nrow || ncols(K1_R) != ncol)
+        error("'K1' must have the same dimensions as 'K0'");
 
+    /* Allocate output */
+    SEXP tree_R = PROTECT(allocMatrix(REALSXP, nrow - 1, 5));
 
-	/* Check dimensions */
-	if (!(nrows(K0_R) == nrow && ncols(K0_R) == ncol))
-		error("'%s' must be %d-by-%d", "K0", nrow, ncol);
-	if (!(nrows(K1_R) == nrow && ncols(K1_R) == ncol))
-		error("'%s' must be %d-by-%d", "K1", nrow, ncol);
+    /* Allocate temporary buffer for counts */
+    data_elem_t *counts = (data_elem_t *) R_alloc(nrow * ncol, sizeof(data_elem_t));
 
-	/* Allocate memory for output */
-	tree_R = PROTECT(allocMatrix(REALSXP, nrow-1, 5)); // It takes n-1 merges to merge n points
+    /* Fill in counts (transposed and NA-handled) */
+    for (int j = 0; j < ncol; ++j) {
+        for (int i = 0; i < nrow; ++i) {
+            int idx = i + j * nrow;               // R index (column-major)
+            int cidx = j * nrow + i;              // Transposed index (row-major)
 
-	/* Run clustering */
-	fuse_cluster( REAL(tree_R), INTEGER(K0_R), INTEGER(K1_R), INTEGER(CHR_R), INTEGER(POS_R), nrow, ncol );
+            int k0_val = INTEGER(K0_R)[idx];
+            int k1_val = INTEGER(K1_R)[idx];
 
-	UNPROTECT(1);
-	return tree_R;
+            counts[cidx].k0 = (k0_val == NA_INTEGER) ? FUSE_NA_DOUBLE : (double)k0_val;
+            counts[cidx].k1 = (k1_val == NA_INTEGER) ? FUSE_NA_DOUBLE : (double)k1_val;
+        }
+    }
+
+    /* Call core clustering function */
+    fuse_cluster(REAL(tree_R), counts, INTEGER(CHR_R), INTEGER(POS_R), nrow, ncol);
+
+    UNPROTECT(1);
+    return tree_R;
 }
+
 
 /**
  * @brief Cuts a hierarchical tree into clusters.

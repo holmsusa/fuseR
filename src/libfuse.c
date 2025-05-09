@@ -57,8 +57,11 @@ nLLR(const data_elem_t *LHC, const data_elem_t *RHC, double LOGL_LHC, double LOG
 
 	// Looping trough LHC and RHC to compute combined likelihoood
 	for( j = 0; j < num_of_samples; ++j) {
-		logl += cost(fmax(LHC[j].k0,0) + fmax(RHC[j].k0,0), fmax(LHC[j].k1,0) + fmax(RHC[j].k1,0)) ; // fmax ensures NaN=-1 values are not included
-	}
+		logl += cost((is_na_double(LHC[j].k0) ? 0 : LHC[j].k0) + (is_na_double(RHC[j].k0) ? 0 : RHC[j].k0),
+    				(is_na_double(LHC[j].k1) ? 0 : LHC[j].k1) + (is_na_double(RHC[j].k1) ? 0 : RHC[j].k1));
+
+
+	}	
 
 	return logl - (LOGL_LHC + LOGL_RHC) ;
 }
@@ -98,7 +101,10 @@ init_state(distance_t *distance, double *labels, size_t *l_neighbor, size_t *r_n
 	for(i = 0; i<num_of_sites; ++i) {
 		logl[i] = 0;
 		for (j = 0; j < num_of_samples; ++j ) {
-			logl[i] += cost(counts[num_of_samples*i + j].k0, counts[num_of_samples*i + j].k1);
+			logl[i] += cost((is_na_double(counts[num_of_samples*i + j].k0) ? 0 : counts[num_of_samples*i + j].k0), 
+							(is_na_double(counts[num_of_samples*i + j].k1) ? 0 : counts[num_of_samples*i + j].k1));
+
+			
 		}
 	}
 
@@ -156,17 +162,6 @@ new_pair(size_t current, distance_t *distance, size_t *l_neighbor, size_t *r_nei
 	return current;
 }
 
-double
-max_d(double A, double B) {
-	if(A > B) {
-		return A;
-	}
-	if(B > A) {
-		return B;
-	}
-	return A;
-}
-
 void
 update_counts(data_elem_t *counts, double *logl, size_t LHC, size_t RHC, size_t num_of_samples) {
 	size_t j;
@@ -174,13 +169,12 @@ update_counts(data_elem_t *counts, double *logl, size_t LHC, size_t RHC, size_t 
 	for (j = 0; j < num_of_samples; j++) {
 		double k0, k1, l0, l1;
 
-		// TODO
-		/* NaNs are transformed to -2147483648. So, if a k-value is <0, just add 0. Otherwise, add the value itself*/
-		
-		k0 = max_d(counts[num_of_samples*LHC + j].k0, 0); // Unmethylated counts in LHC
-		k1 = max_d(counts[num_of_samples*LHC + j].k1, 0); // Methylated counts in LHC
-		l0 = max_d(counts[num_of_samples*RHC + j].k0, 0); // Unmethylated counts in RHC
-		l1 = max_d(counts[num_of_samples*RHC + j].k1, 0); // Methylated coutns in RHC
+		/* Get counts for LHC and RHC */
+		k0 = is_na_double(counts[num_of_samples * LHC + j].k0) ? 0 : counts[num_of_samples * LHC + j].k0; // Unmethylated counts in LHC
+		k1 = is_na_double(counts[num_of_samples * LHC + j].k1) ? 0 : counts[num_of_samples * LHC + j].k1; // Methylated counts in LHC
+		l0 = is_na_double(counts[num_of_samples * RHC + j].k0) ? 0 : counts[num_of_samples * RHC + j].k0; // Unmethylated counts in RHC
+		l1 = is_na_double(counts[num_of_samples * RHC + j].k1) ? 0 : counts[num_of_samples * RHC + j].k1; // Methylated coutns in RHC
+
 
 		/* New counts are written into index of the lefthand cluster */
 		counts[num_of_samples*LHC + j].k0 = k0 + l0; 
@@ -315,7 +309,7 @@ sort_tree(double *tree_sorted, void *scratch, const double *tree_unsorted, size_
 }
 
 void
-fuse_cluster(double *tree, const int *K0, const int *K1, const int *chr, const int *pos, size_t num_of_sites, size_t num_of_samples)
+fuse_cluster(double *tree, data_elem_t *counts, const int *chr, const int *pos, size_t num_of_sites, size_t num_of_samples)
 {
 	/* Initializing helper variables */
 	distance_t *distance; // vector for storing distances between CpG-sites
@@ -327,7 +321,6 @@ fuse_cluster(double *tree, const int *K0, const int *K1, const int *chr, const i
 	size_t i, j; // counters
 	size_t I_NO; // invalid index (rightmost)
 	size_t LHC, RHC; // Lefthand cluster and righthand cluster to merge
-	data_elem_t *counts; // matrix holding the values of K0 and K1 at every CpG-site for every sample as doubles
 	
 
 	/* Check empty problem */
@@ -341,18 +334,9 @@ fuse_cluster(double *tree, const int *K0, const int *K1, const int *chr, const i
 	distance = malloc(sizeof(*distance) * (num_of_sites+1));
 	labels = malloc(sizeof(*labels) * num_of_sites);
 	logl = malloc(sizeof(*logl) * num_of_sites);
-	counts = malloc(sizeof(*counts) * num_of_sites*num_of_samples);
 	l_neighbor = malloc(sizeof(*l_neighbor) * num_of_sites);
 	r_neighbor = malloc(sizeof(*r_neighbor) * num_of_sites);
 	tracked_cost = malloc(sizeof(*tracked_cost) * num_of_sites);
-
-	/* R matrices need to be transposed for indexing to be correct. Transposing K0 and K1 and copying to counts.k0 and counts.k1. */
-	for (j = 0; j < num_of_samples; ++j) {
-		for (i = 0; i < num_of_sites; ++i) {
-			counts[ i*num_of_samples + j ].k0 = K0[ i + j*num_of_sites ]; 
-			counts[ i*num_of_samples + j ].k1 = K1[ i + j*num_of_sites ];
-		}
-	}
 	
 	/* Initializing rest of variables */
 	init_state( distance, labels, l_neighbor, r_neighbor, counts, logl, tracked_cost, chr, pos, num_of_sites, num_of_samples );
@@ -372,7 +356,10 @@ fuse_cluster(double *tree, const int *K0, const int *K1, const int *chr, const i
 
 		/* Compute the total sum of likelihoods of merge and add to tree */ 
 		for (i = 0; i < num_of_samples; ++i ) {
-			 new_clust_logl += cost(counts[num_of_samples*LHC + i].k0 + counts[num_of_samples*RHC + i].k0, counts[num_of_samples*LHC + i].k1 + counts[num_of_samples*RHC + i].k1);
+			 new_clust_logl += cost((is_na_double(counts[num_of_samples*LHC + i].k0) ? 0 :counts[num_of_samples*LHC + i].k0) + 
+			 						(is_na_double(counts[num_of_samples*RHC + i].k0) ? 0 :counts[num_of_samples*RHC + i].k0), 
+									(is_na_double(counts[num_of_samples*LHC + i].k1) ? 0 :counts[num_of_samples*LHC + i].k1) + 
+									(is_na_double(counts[num_of_samples*RHC + i].k1) ? 0 :counts[num_of_samples*RHC + i].k1));	
 		}
 
 		/* Record merge into tree */
@@ -433,7 +420,6 @@ fuse_cluster(double *tree, const int *K0, const int *K1, const int *chr, const i
 	free(tracked_cost);
 	free(l_neighbor);
 	free(r_neighbor);
-	free(counts);
 }
 
 static
