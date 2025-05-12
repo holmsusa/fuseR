@@ -19,3 +19,11 @@ Clustering tree as a matrix
 \description{
 Produces a hierarchical clustering tree based on the input matrices of counts.
 }
+\examples{
+# Example: Clustering generated data
+K0 <- matrix(sample(c(1:200), 125, replace = TRUE), ncol = 5)
+K1 <- matrix(sample(c(1:200), 125, replace = TRUE), ncol = 5)
+tree <- fuse.cluster(K0, K1)
+tree
+
+}
