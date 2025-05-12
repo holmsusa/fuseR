@@ -15,3 +15,12 @@ Sorted tree
 \description{
 Sorts the clustering tree produced by \code{\link{fuse.cluster}}.
 }
+\examples{
+# Example: Sorting unsorted clustering tree
+K0 <- matrix(sample(c(1:200), 80, replace = TRUE), ncol = 5)
+K1 <- matrix(sample(c(1:200), 80, replace = TRUE), ncol = 5)
+tree <- fuse.cluster(K0, K1, sort = FALSE)
+tree.sorted <- fuse.sort.tree(tree)
+tree
+
+}
