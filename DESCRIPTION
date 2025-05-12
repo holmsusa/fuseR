@@ -4,7 +4,7 @@ Version: 0.0.0.9000
 Authors@R: 
     person("Susanna", "Holmström", , "susanna.k.holmstrom@helsinki.fi", role = c("aut", "cre"),
            comment = c(ORCID = "0009-0005-7542-5913"))
-Description: FuseR finds functional segments in whole-genome bisulphite sequencing data.
+Description: FuseR finds functional segments in whole-genome bisulphite sequencing data through hierarchical clustering.
 License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
