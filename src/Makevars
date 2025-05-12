@@ -1,2 +1,2 @@
-PKG_CFLAGS = -std=c99 -pedantic -Wall -Wextra -fopenmp -fopenmp-simd
-PKG_LIBS = -lm -fopenmp
+PKG_CFLAGS = $(SHLIB_OPENMP_CFLAGS)
+PKG_LIBS = -lm $(SHLIB_OPENMP_CFLAGS)
