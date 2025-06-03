@@ -54,7 +54,7 @@ double
 nLLR(const data_elem_t *LHC, const data_elem_t *RHC, double LOGL_LHC, double LOGL_RHC, size_t num_of_samples) {
 	size_t j;
 	double logl = 0;
-
+	//printf("Computing new distance\n");
 	// Looping trough LHC and RHC to compute combined likelihoood
 	for( j = 0; j < num_of_samples; ++j) {
 		logl += cost((is_na_double(LHC[j].k0) ? 0 : LHC[j].k0) + (is_na_double(RHC[j].k0) ? 0 : RHC[j].k0),
@@ -392,17 +392,20 @@ fuse_cluster(double *tree, data_elem_t *counts, const int *chr, const int *pos, 
 		/* Update data: counts[LHC] now holds the sum of all merged points */
 		update_counts(counts, logl, LHC, RHC, num_of_samples);
 
-		/* Update distances */
+		/* Update distances 
+		Left point of pair holds distance. Updating:
+		- l_neighbor(LHC) for the pair [l_neighbor(LHC), LHC]
+		- LHC for the pair [LHC, r_neighbor(LHC)]
+		*/
 		if ( l_neighbor[LHC] != I_NO) {
 			distance[l_neighbor[LHC]] = merged_cost( &counts[num_of_samples*l_neighbor[LHC]], &counts[num_of_samples*LHC], logl[l_neighbor[LHC]], logl[LHC], chr[l_neighbor[LHC]], chr[LHC], pos[LHC-1], pos[LHC], num_of_samples);
 			
 		}
 		if ( r_neighbor[LHC] != I_NO) {
 			distance[LHC] = merged_cost(&counts[num_of_samples*LHC], &counts[num_of_samples*r_neighbor[LHC]], logl[LHC], logl[r_neighbor[LHC]], chr[LHC], chr[r_neighbor[LHC]], pos[r_neighbor[LHC]-1], pos[r_neighbor[LHC]], num_of_samples);
-			
 
 		} else {
-			distance[LHC].d = INFINITY; 
+			distance[LHC].d = INFINITY;
 			distance[LHC].nllr = INFINITY;
 		}
 			distance[RHC].d = INFINITY;

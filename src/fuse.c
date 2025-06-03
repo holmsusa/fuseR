@@ -90,7 +90,7 @@ fuse_cluster_R(SEXP K0_R, SEXP K1_R, SEXP CHR_R, SEXP POS_R)
     for (int j = 0; j < ncol; ++j) {
         for (int i = 0; i < nrow; ++i) {
             int idx = i + j * nrow;               // R index (column-major)
-            int cidx = j * nrow + i;              // Transposed index (row-major)
+            int cidx = j + i * ncol;              // Transposed index (row-major)
 
             int k0_val = INTEGER(K0_R)[idx];
             int k1_val = INTEGER(K1_R)[idx];
@@ -100,6 +100,7 @@ fuse_cluster_R(SEXP K0_R, SEXP K1_R, SEXP CHR_R, SEXP POS_R)
         }
     }
 
+    
     /* Call core clustering function */
     fuse_cluster(REAL(tree_R), counts, INTEGER(CHR_R), INTEGER(POS_R), nrow, ncol);
 

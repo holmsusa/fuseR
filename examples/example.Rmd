@@ -21,8 +21,10 @@ We start by reading in the data, which consist of the tables K0 and K1. Both hav
 - K1 contains the methylated counts
 
 ```{r}
-k0 <- read.table('k0.tsv', header = T, row.names = 1)
-k1 <- read.table('k1.tsv', header = T, row.names = 1)
+k0 <- read.table('../../methylation/manuscript/simulated_dataset/data0/k0_data0.csv', header = T, row.names = 1)
+k1 <- read.table('../../methylation/manuscript/simulated_dataset/data0/k1_data0.csv', header = T, row.names = 1)
+#k0 <- read.table('k0.tsv', header = T, row.names = 1)
+#k1 <- read.table('k1.tsv', header = T, row.names = 1)
 
 head(k0)
 ```
@@ -63,7 +65,7 @@ for( i in 1:nrow(tree)) {
 }
 ```
 
-We want to chose the model (number of clusters) that minimizes BIC. Let's see what the BIC curve look like: 
+We want to chose the model (number of clusters) that minimizes BIC. Let's see what the BIC curve looks like: 
 
 ```{r, echo = FALSE}
 plot(bic)
