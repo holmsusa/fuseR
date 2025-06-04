@@ -47,6 +47,7 @@ sorted_tree <- fuse.sort.tree(tree)
 # Cut tree into 3 clusters
 segments <- fuse.cutree(sorted_tree, 3)
 ```
+Check out an example workflow in examples/example.md
 
 ## License
 This package is licensed under the MIT License. See the LICENSE file for details.
