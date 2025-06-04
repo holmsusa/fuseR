@@ -1,5 +1,5 @@
 ---
-title: "example"
+title: "Example workflow using FUSE"
 author: "Susanna Holmstrom"
 date: "2025-05-12"
 output: html_document
@@ -8,8 +8,6 @@ output: html_document
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
-
-## Example workflow using FUSE
 
 ```{r}
 library(fuseR)
@@ -23,8 +21,8 @@ We start by reading in the data, which consist of the tables K0 and K1. Both hav
 This is a dummy data set consisting of the 100 000 first CpG sites in chromosome 20. 
 
 ```{r}
-k0 <- read.table(gzfile('k0.tsv'), header = T, row.names = 1)
-k1 <- read.table(gzfile('k1.tsv'), header = T, row.names = 1)
+k0 <- read.table(gzfile('k0.tsv.gz'), header = T, row.names = 1)
+k1 <- read.table(gzfile('k1.tsv.gz'), header = T, row.names = 1)
 
 head(k0)
 ```
