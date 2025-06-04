@@ -10,8 +10,10 @@ library(fuseR)
 ### Reading in data
 
 We start by reading in the data, which consist of the tables K0 and K1.
-Both have CpG loci as rows and samples as columns, and - K0 contains the
-unmethylated counts - K1 contains the methylated counts
+Both have CpG loci as rows and samples as columns, and
+
+- K0 contains the unmethylated counts
+- K1 contains the methylated counts
 
 This is a dummy data set consisting of the 100 000 first CpG sites in
 chromosome 20.
@@ -64,11 +66,13 @@ head(tree)
     ## [5,] -23937 -23938 16.63625   16.63625     1.144830
     ## [6,] -41560 -41561 17.26477   17.26477     1.146329
 
-The clustering ‘tree’ contains the following columns: - ‘m1’: the label
-of the first merged point - ‘m2’: the label of the second merged point -
-‘logl_tot’: Change in total log-likelihood for forming this merge -
-‘logl_merge’: Total cost of the points in this formed cluster -
-‘genomic_dist’: Distance penalty for this merge
+The clustering ‘tree’ contains the following columns:
+
+- ‘m1’: the label of the first merged point
+- ‘m2’: the label of the second merged point
+- ‘logl_tot’: Change in total log-likelihood for forming this merge
+- ‘logl_merge’: Total cost of the points in this formed cluster
+- ‘genomic_dist’: Distance penalty for this merge
 
 ### Number of segments
 
