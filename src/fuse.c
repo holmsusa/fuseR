@@ -74,8 +74,8 @@ fuse_cluster_R(SEXP K0_R, SEXP K1_R, SEXP CHR_R, SEXP POS_R)
     int ncol = ncols(K0_R);
 
     /* Validate input */
-    if (!isInteger(K0_R) || !isInteger(K1_R))
-        error("'K0' and 'K1' must be integer matrices");
+    if (!(isInteger(K0_R) || isReal(K0_R)) || !(isInteger(K1_R) || isReal(K1_R)))
+        error("'K0' and 'K1' must be either integer or numeric matrices");
 
     if (nrows(K1_R) != nrow || ncols(K1_R) != ncol)
         error("'K1' must have the same dimensions as 'K0'");
@@ -92,11 +92,31 @@ fuse_cluster_R(SEXP K0_R, SEXP K1_R, SEXP CHR_R, SEXP POS_R)
             int idx = i + j * nrow;               // R index (column-major)
             int cidx = j + i * ncol;              // Transposed index (row-major)
 
-            int k0_val = INTEGER(K0_R)[idx];
-            int k1_val = INTEGER(K1_R)[idx];
+            // int k0_val = INTEGER(K0_R)[idx];
+            // int k1_val = INTEGER(K1_R)[idx];
+            double k0_val, k1_val;
 
-            counts[cidx].k0 = (k0_val == NA_INTEGER) ? FUSE_NA_DOUBLE : (double)k0_val;
-            counts[cidx].k1 = (k1_val == NA_INTEGER) ? FUSE_NA_DOUBLE : (double)k1_val;
+            // counts[cidx].k0 = (k0_val == NA_INTEGER) ? FUSE_NA_DOUBLE : (double)k0_val;
+            // counts[cidx].k1 = (k1_val == NA_INTEGER) ? FUSE_NA_DOUBLE : (double)k1_val;
+
+            if (isInteger(K0_R)) {
+                int val = INTEGER(K0_R)[idx];
+                k0_val = (val == NA_INTEGER) ? FUSE_NA_DOUBLE : (double)val;
+            } else {
+                double val = REAL(K0_R)[idx];
+                k0_val = (ISNA(val) || ISNAN(val)) ? FUSE_NA_DOUBLE : val;
+            }
+
+            if (isInteger(K1_R)) {
+                int val = INTEGER(K1_R)[idx];
+                k1_val = (val == NA_INTEGER) ? FUSE_NA_DOUBLE : (double)val;
+            } else {
+                double val = REAL(K1_R)[idx];
+                k1_val = (ISNA(val) || ISNAN(val)) ? FUSE_NA_DOUBLE : val;
+            }
+
+            counts[cidx].k0 = k0_val;
+            counts[cidx].k1 = k1_val;
         }
     }
 
