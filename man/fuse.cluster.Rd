@@ -14,7 +14,14 @@ fuse.cluster(K0, K1, sort = TRUE)
 \item{sort}{Default is true, sorts the tree in optimal order}
 }
 \value{
-Clustering tree as a matrix
+Clustering tree as a matrix, with the same structure as hclust, including the columns
+\describe{
+\item{m1}{ID of first data point. <0 is original point, >0 is row of previous merge.}
+\item{m2}{ID of second data point. <0 is original point, >0 is row of previous merge.}
+\item{logl_tot}{Change in total log-likelihood of merge.}
+\item{logl_merge}{Total cost of points in this merge.}
+\item{genomic_dist}{Penalty for genomic distance between points.}
+}
 }
 \description{
 Produces a hierarchical clustering tree based on the input matrices of counts.

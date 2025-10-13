@@ -43,7 +43,7 @@ NULL
 #' }
 #'
 #' @export
-fuse_segment <- function(K0, K1, chr, pos, method = c("BIC", "AIC"), sort = TRUE) {
+fuse.segment <- function(K0, K1, chr, pos, method = c("BIC", "AIC"), sort = TRUE) {
   # --- Input validation ---
   stopifnot(
     is.matrix(K0),

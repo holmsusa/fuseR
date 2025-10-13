@@ -2,8 +2,8 @@
 
 export(fuse.cluster)
 export(fuse.cut.tree)
+export(fuse.segment)
 export(fuse.sort.tree)
 export(fuse.summary)
-export(fuse_segment)
 export(number.of.clusters)
 useDynLib(fuseR, .registration = TRUE)

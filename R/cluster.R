@@ -7,7 +7,17 @@ NULL
 #' @param K0 Integer or numeric matrix with unmethylated counts
 #' @param K1 Integer or numeric matrix with methylated counts
 #' @param sort Default is true, sorts the tree in optimal order
-#' @return Clustering tree as a matrix
+#'
+#' @return
+#' Clustering tree as a matrix, with the same structure as hclust, including the columns
+#' \describe{
+#'   \item{m1}{ID of first data point. <0 is original point, >0 is row of previous merge.}
+#'   \item{m2}{ID of second data point. <0 is original point, >0 is row of previous merge.}
+#'   \item{logl_tot}{Change in total log-likelihood of merge.}
+#'   \item{logl_merge}{Total cost of points in this merge.}
+#'   \item{genomic_dist}{Penalty for genomic distance between points.}
+#' }
+#'
 #' @examples
 #' # Example: Clustering generated data
 #' K0 <- matrix(sample(c(1:200), 125, replace = TRUE), ncol = 5)
