@@ -47,10 +47,12 @@ library(fuseR)
 set.seed(1234)
 
 # Generate sample data
+# Unmethylated counts, T's
 K0 <- matrix(
   rep(c(sample(0:20, 200, replace = TRUE), sample(20:40, 200, replace = TRUE)), 2),
   nrow = 100, byrow = TRUE
 )
+# Methylated counts, C's
 K1 <- matrix(
   rep(c(sample(20:40, 200, replace = TRUE), sample(0:20, 200, replace = TRUE)), 2),
   nrow = 100, byrow = TRUE
