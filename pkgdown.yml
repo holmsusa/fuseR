@@ -2,7 +2,7 @@ pandoc: 3.1.11
 pkgdown: 2.2.0
 pkgdown_sha: ~
 articles: {}
-last_built: 2025-11-20T12:12Z
+last_built: 2025-11-20T12:20Z
 urls:
   reference: https://holmsusa.github.io/fuseR/reference
   article: https://holmsusa.github.io/fuseR/articles

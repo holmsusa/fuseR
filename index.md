@@ -72,7 +72,7 @@ head(segment_result$betas_per_segment)
 ```
 
 Check out a **full example workflow** in
-[example.md](https://holmsusa.github.io/fuseR/inst/examples/example.md).
+[example.md](https://holmsusa.github.io/inst/examples/example.md).
 
 ## License
 
