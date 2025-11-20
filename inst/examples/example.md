@@ -1,7 +1,7 @@
 Example workflow using FUSE
 ================
 Susanna Holmstrom
-2025-10-13
+2025-11-12
 
 ``` r
 library(fuseR)
@@ -10,7 +10,7 @@ library(fuseR)
 ### Reading in data
 
 We start by reading in the data, which consist of the tables K0 and K1.
-Both have CpG loci as rows and samples as columns, and
+Both have CpG sites as rows and samples as columns, and
 
 - K0 contains the unmethylated counts
 - K1 contains the methylated counts
@@ -50,14 +50,15 @@ head(K0)
 ### Apply FUSE as a pipeline
 
 The whole FUSE pipeline can be applied using the function
-‘fuse.segment()’. It performs the following step:
+‘fuse.segment()’. It performs the following steps:
 
 1.  clustering
 2.  cutting clustering tree optimally
-3.  summarizes segments
+3.  summarizing segments
 
-The function takes as input the count matrices K0 and K1, and a summary
-table and a data frame with betas.
+The function takes as input the count matrices K0 and K1 and the
+chromosome and position information for each CpG site, and outputs a
+summary table and a data frame with betas.
 
 ``` r
 segment_result <- fuse.segment(
@@ -112,10 +113,10 @@ head(segment_result$betas_per_segment)
 
 ## Apply FUSE through separate steps
 
-I the intermediate outputs of the method are relevant, then the pipeline
-can also be applied by calling each of the functions ‘fuse.cluster()’,
-‘number.of.clusters()’, ‘fuse.cut.tree()’, and ‘fuse.summary()’
-separately.
+If the intermediate outputs of the method are relevant, then the
+pipeline can also be applied by calling each of the functions
+‘fuse.cluster()’, ‘number.of.clusters()’, ‘fuse.cut.tree()’, and
+‘fuse.summary()’ separately.
 
 ### 1. Cluster
 
