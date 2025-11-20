@@ -26,8 +26,8 @@ We start by reading in the data, which consist of the tables K0 and K1. Both hav
 This is a dummy data set consisting of manipulated counts of the 100 000 first CpG sites in chromosome 20. 
 
 ```{r}
-k0_file <- system.file("examples/k0.tsv.gz", package = "fuseR")
-k1_file <- system.file("examples/k1.tsv.gz", package = "fuseR")
+k0_file <- system.file("inst/examples/k0.tsv.gz", package = "fuseR")
+k1_file <- system.file("inst/examples/k1.tsv.gz", package = "fuseR")
 
 K0 <- read.table(k0_file, header = TRUE)
 K1 <- read.table(k1_file, header = TRUE)
