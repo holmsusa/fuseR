@@ -1,8 +1,12 @@
 ---
 title: "Example workflow using FUSE"
 author: "Susanna Holmstrom"
-date: "2025-11-12"
-output: github_document
+date: "2025-11-20"
+output:  rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Example}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
 ---
 
 ```{r setup, include=FALSE}
@@ -22,8 +26,12 @@ We start by reading in the data, which consist of the tables K0 and K1. Both hav
 This is a dummy data set consisting of manipulated counts of the 100 000 first CpG sites in chromosome 20. 
 
 ```{r}
-K0 <- read.table(gzfile('k0.tsv.gz'), header = T, row.names = 1)
-K1 <- read.table(gzfile('k1.tsv.gz'), header = T, row.names = 1)
+k0_file <- system.file("examples/k0.tsv.gz", package = "fuseR")
+k1_file <- system.file("examples/k1.tsv.gz", package = "fuseR")
+
+K0 <- read.table(k0_file, header = TRUE)
+K1 <- read.table(k1_file, header = TRUE)
+
 
 head(K0)
 ```
@@ -131,7 +139,7 @@ betas_df <- data.frame(beta = rowMeans(raw_betas), pos =  as.numeric(sub("^.*\\.
 # Create the plot
 ggplot() +
   geom_segment(
-    # data = result$summary[1:10, ],
+    data = result$summary[1:10, ],
     aes(x = Start, xend = End, y = Beta, yend = Beta, color = Beta > 0.5),
     linewidth = 1.2
   ) +
