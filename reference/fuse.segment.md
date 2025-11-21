@@ -78,10 +78,10 @@ chr <- rep("chr1", nrow(K0))
 pos <- 1:nrow(K0)
 res <- fuse.segment(K0, K1, chr, pos, method = "BIC")
 head(res$summary)
-#>   Segment  Chr Start End CpGs Length      Beta Stable
-#> 1  chr1.1 chr1     1  25   25     25 0.7523929   TRUE
-#> 2 chr1.26 chr1    26  50   25     25 0.2355517   TRUE
-#> 3 chr1.51 chr1    51  75   25     25 0.7523929   TRUE
-#> 4 chr1.76 chr1    76 100   25     25 0.2355517   TRUE
+#>   Segment  Chr Start End CpGs Length      Beta Coherent
+#> 1  chr1.1 chr1     1  25   25     25 0.7523929     TRUE
+#> 2 chr1.26 chr1    26  50   25     25 0.2355517     TRUE
+#> 3 chr1.51 chr1    51  75   25     25 0.7523929     TRUE
+#> 4 chr1.76 chr1    76 100   25     25 0.2355517     TRUE
 # }
 ```

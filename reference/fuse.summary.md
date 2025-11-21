@@ -62,11 +62,11 @@ tree <- fuse.cluster(K0, K1)
 segments <- fuse.cut.tree(tree, 4)
 res <- fuse.summary(K0, K1, rep("chr1", nrow(K0)), 1:nrow(K0), segments)
 head(res$summary)
-#>   Segment  Chr Start End CpGs Length      Beta Stable
-#> 1  chr1.1 chr1     1  25   25     25 0.7523929   TRUE
-#> 2 chr1.26 chr1    26  50   25     25 0.2355517   TRUE
-#> 3 chr1.51 chr1    51  75   25     25 0.7523929   TRUE
-#> 4 chr1.76 chr1    76 100   25     25 0.2355517   TRUE
+#>   Segment  Chr Start End CpGs Length      Beta Coherent
+#> 1  chr1.1 chr1     1  25   25     25 0.7523929     TRUE
+#> 2 chr1.26 chr1    26  50   25     25 0.2355517     TRUE
+#> 3 chr1.51 chr1    51  75   25     25 0.7523929     TRUE
+#> 4 chr1.76 chr1    76 100   25     25 0.2355517     TRUE
 head(res$betas_per_segment)
 #>              [,1]      [,2]      [,3]      [,4]      [,5]      [,6]      [,7]
 #> chr1.1  0.7895277 0.7677083 0.7163462 0.7583893 0.7068311 0.7875920 0.7548919

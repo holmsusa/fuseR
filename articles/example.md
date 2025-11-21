@@ -71,13 +71,13 @@ segment_result <- fuse.segment(
 head(segment_result$summary)
 ```
 
-    ##       Segment   Chr Start   End CpGs Length      Beta Stable
-    ## 1 chr20.60008 chr20 60008 61140   17   1133 0.8378468   TRUE
-    ## 2 chr20.61141 chr20 61141 61817   12    677 0.8450438   TRUE
-    ## 3 chr20.61818 chr20 61818 63862   18   2045 0.8514536   TRUE
-    ## 4 chr20.63863 chr20 63863 64424   13    562 0.8565943   TRUE
-    ## 5 chr20.64609 chr20 64609 64728    6    120 0.6418476   TRUE
-    ## 6 chr20.64778 chr20 64778 65365    6    588 0.1449167   TRUE
+    ##       Segment   Chr Start   End CpGs Length      Beta Coherent
+    ## 1 chr20.60008 chr20 60008 61140   17   1133 0.8378468     TRUE
+    ## 2 chr20.61141 chr20 61141 61817   12    677 0.8450438     TRUE
+    ## 3 chr20.61818 chr20 61818 63862   18   2045 0.8514536     TRUE
+    ## 4 chr20.63863 chr20 63863 64424   13    562 0.8565943     TRUE
+    ## 5 chr20.64609 chr20 64609 64728    6    120 0.6418476     TRUE
+    ## 6 chr20.64778 chr20 64778 65365    6    588 0.1449167     TRUE
 
 ``` r
 head(segment_result$betas_per_segment)
@@ -190,13 +190,13 @@ result <- fuse.summary(as.matrix(K0),
 head(result$summary)
 ```
 
-    ##       Segment   Chr Start   End CpGs Length      Beta Stable
-    ## 1 chr20.60008 chr20 60008 61140   17   1133 0.8378468   TRUE
-    ## 2 chr20.61141 chr20 61141 61817   12    677 0.8450438   TRUE
-    ## 3 chr20.61818 chr20 61818 63862   18   2045 0.8514536   TRUE
-    ## 4 chr20.63863 chr20 63863 64424   13    562 0.8565943   TRUE
-    ## 5 chr20.64609 chr20 64609 64728    6    120 0.6418476   TRUE
-    ## 6 chr20.64778 chr20 64778 65365    6    588 0.1449167   TRUE
+    ##       Segment   Chr Start   End CpGs Length      Beta Coherent
+    ## 1 chr20.60008 chr20 60008 61140   17   1133 0.8378468     TRUE
+    ## 2 chr20.61141 chr20 61141 61817   12    677 0.8450438     TRUE
+    ## 3 chr20.61818 chr20 61818 63862   18   2045 0.8514536     TRUE
+    ## 4 chr20.63863 chr20 63863 64424   13    562 0.8565943     TRUE
+    ## 5 chr20.64609 chr20 64609 64728    6    120 0.6418476     TRUE
+    ## 6 chr20.64778 chr20 64778 65365    6    588 0.1449167     TRUE
 
 ``` r
 head(result$betas_per_segment)
