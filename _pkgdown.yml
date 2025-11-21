@@ -9,6 +9,7 @@ navbar:
       - home
       - reference
       - example
+      - gs
       - news
 
   components:

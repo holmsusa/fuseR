@@ -19,7 +19,7 @@ test_that("fuse.summary returns correct structure and dimensions", {
   sm <- res$summary
   expect_s3_class(sm, "data.frame")
   expect_true(all(c("Segment", "Chr", "Start", "End",
-                    "CpGs", "Length", "Beta", "Stable") %in% names(sm)))
+                    "CpGs", "Length", "Beta", "Coherent") %in% names(sm)))
 
   # One row per segment
   expect_equal(nrow(sm), length(unique(segments)))
@@ -30,7 +30,7 @@ test_that("fuse.summary returns correct structure and dimensions", {
 
   # Types and ranges
   expect_true(all(is.numeric(sm$Beta)))
-  expect_true(all(is.logical(sm$Stable)))
+  expect_true(all(is.logical(sm$Coherent)))
   expect_true(all(sm$CpGs > 0))
   expect_true(all(sm$Length >= 1))
 })
@@ -96,7 +96,7 @@ test_that("fuse.summary stability flag is logical and reproducible", {
   res1 <- fuse.summary(K0, K1, chr, pos, segments)
   res2 <- fuse.summary(K0, K1, chr, pos, segments)
 
-  expect_equal(res1$summary$Stable, res2$summary$Stable)
-  expect_type(res1$summary$Stable, "logical")
+  expect_equal(res1$summary$Coherent, res2$summary$Coherent)
+  expect_type(res1$summary$Coherent, "logical")
 })
 

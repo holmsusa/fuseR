@@ -28,7 +28,7 @@ NULL
 #'       \item{CpGs}{Number of CpGs in the segment}
 #'       \item{Length}{Genomic length (End - Start + 1)}
 #'       \item{Beta}{Average methylation across samples and CpGs}
-#'       \item{Stable}{Logical indicator (TRUE if segment is stable, else FALSE)}
+#'       \item{Coherent}{Logical indicator (TRUE if segment is coherently methylated, else FALSE)}
 #'     }
 #'   \item{betas_per_segment}{Matrix of per-sample methylation estimates for each segment
 #'   (rows = segments, columns = samples).}
@@ -98,7 +98,7 @@ fuse.summary <- function(K0, K1, chr, pos, segments) {
 
   # --- Compute p-values and stability flag (using base R) ---
   pvals <- 1 - pchisq(-2 * (LL1 - LL2), df = df1 - df2)
-  stable_flag <- pvals < 0.05
+  coherent_flag <- pvals < 0.05
 
   # --- Compute average beta per segment ---
   total_K0 <- rowSums(K0_seg, na.rm = TRUE)
@@ -121,7 +121,7 @@ fuse.summary <- function(K0, K1, chr, pos, segments) {
     CpGs = segment_cpgs,
     Length = segment_len,
     Beta = beta_seg,
-    Stable = stable_flag
+    Coherent = coherent_flag
   )
 
   rownames(summary_df) <- NULL
