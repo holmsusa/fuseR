@@ -3,7 +3,7 @@ pkgdown: 2.2.0
 pkgdown_sha: ~
 articles:
   example: example.html
-last_built: 2025-11-26T13:10Z
+last_built: 2025-11-26T13:17Z
 urls:
   reference: https://holmsusa.github.io/fuseR/reference
   article: https://holmsusa.github.io/fuseR/articles

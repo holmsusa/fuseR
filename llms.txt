@@ -1,4 +1,4 @@
-# fuseR ![](reference/figures/fuse_logo_meth.svg)
+# ![fuseR hexagon](reference/figures/fuse_logo_meth.svg) fuseR
 
 **fuseR** implements FUSE: **FUnctional SEgmentation of DNA methylation
 data** through hierarchical clustering.
