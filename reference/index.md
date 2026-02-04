@@ -7,7 +7,7 @@
 - [`fuse.cut.tree()`](https://holmsusa.github.io/fuseR/reference/fuse.cut.tree.md)
   : Cut Hierarchical Clustering Tree into Clusters
 - [`fuse.segment()`](https://holmsusa.github.io/fuseR/reference/fuse.segment.md)
-  : Full FUSE Segmentation Pipeline
+  : Full FUSE segmentation pipeline
 - [`fuse.summary()`](https://holmsusa.github.io/fuseR/reference/fuse.summary.md)
   : Summarize FUSE Segmentation Results
 - [`number.of.clusters()`](https://holmsusa.github.io/fuseR/reference/number.of.clusters.md)

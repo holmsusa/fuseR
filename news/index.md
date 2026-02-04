@@ -31,8 +31,8 @@
   [`plot()`](https://rdrr.io/r/graphics/plot.default.html) during
   vignette building.
 - Fixed lazy-load and installation issues caused by partial rebuilds.
-- Fixed edge cases in beta computation when counts sum to zero. \# -
-  Fixed the swapped TRUE/FALSE labels for coherent segments in
+- Fixed edge cases in beta computation when counts sum to zero.
+- Fixed the swapped TRUE/FALSE labels for coherent segments in
   [`fuse.summary()`](https://holmsusa.github.io/fuseR/reference/fuse.summary.md).
 
 ------------------------------------------------------------------------

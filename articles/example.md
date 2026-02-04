@@ -66,7 +66,7 @@ segment_result <- fuse.segment(
   as.matrix(K0), 
   as.matrix(K1), 
   chr = sub("\\..*$", "", rownames(K0)), 
-  pos = as.numeric(sub("^.*\\.", "", rownames(K0))))
+  pos = as.integer(sub("^.*\\.", "", rownames(K0))))
 
 head(segment_result$summary)
 ```
@@ -137,12 +137,12 @@ head(tree)
 ```
 
     ##          m1     m2 logl_tot logl_merge genomic_dist
-    ## [1,] -45579 -45580 10.65993   10.65993     1.144830
-    ## [2,] -57737 -57738 12.62932   12.62932     1.144830
-    ## [3,] -46190 -46191 12.70708   12.70708     1.176616
-    ## [4,] -49658 -49659 12.57786   12.57786     1.877867
-    ## [5,] -23937 -23938 16.63625   16.63625     1.144830
-    ## [6,] -41560 -41561 17.26477   17.26477     1.146329
+    ## [1,] -45579 -45580 10.65993   10.65993      1.14483
+    ## [2,] -49658 -49659 12.57786   12.57786      1.14483
+    ## [3,] -57737 -57738 12.62932   12.62932      1.14483
+    ## [4,] -46190 -46191 12.70708   12.70708      1.14483
+    ## [5,] -23937 -23938 16.63625   16.63625      1.14483
+    ## [6,] -88318 -88319 16.75105   16.75105      1.14483
 
 The clustering ‘tree’ contains the following columns:
 
@@ -168,7 +168,7 @@ optimal_num_of_segments <- number.of.clusters(tree, ncol(K0), 'BIC')
 optimal_num_of_segments
 ```
 
-    ## [1] 9030
+    ## [1] 9027
 
 The tree can then be cut using ‘fuse.cut.tree()’
 
@@ -245,13 +245,13 @@ The outputs are identical.
 identical(segment_result$summary, result$summary)
 ```
 
-    ## [1] TRUE
+    ## [1] FALSE
 
 ``` r
 identical(segment_result$betas_per_segment, result$betas_per_segment)
 ```
 
-    ## [1] TRUE
+    ## [1] FALSE
 
 ## Plotting
 

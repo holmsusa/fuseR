@@ -87,4 +87,5 @@ head(res$betas_per_segment)
 #> chr1.26 0.2651515
 #> chr1.51 0.7444562
 #> chr1.76 0.2651515
+
 ```
