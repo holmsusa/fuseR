@@ -1,7 +1,3 @@
-#' @useDynLib fuseR, .registration = TRUE
-NULL
-
-
 #' Find Optimal Number of Clusters
 #'
 #' @description

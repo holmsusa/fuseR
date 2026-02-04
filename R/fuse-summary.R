@@ -1,7 +1,3 @@
-#' @useDynLib fuseR, .registration = TRUE
-NULL
-
-#'
 #' Summarize FUSE Segmentation Results
 #'
 #' @description
@@ -53,21 +49,23 @@ NULL
 #' head(res$summary)
 #' head(res$betas_per_segment)
 #'
+#'
 #' @export
-#' @importFrom stats pchisq
 fuse.summary <- function(K0, K1, chr, pos, segments) {
+  if (!requireNamespace("stats", quietly = TRUE)) {
+    stop(
+      "Summary support requires the 'stats' package.\n",
+      "Install it with install.packages('stats').",
+      call. = FALSE
+    )
+  }
+
   # --- Input validation ---
-  stopifnot(
-    is.matrix(K0),
-    is.matrix(K1),
-    all(dim(K0) == dim(K1)),
-    is.character(chr),
-    length(chr) == nrow(K0),
-    is.numeric(pos),
-    length(pos) == nrow(K0),
-    (is.numeric(segments) || is.integer(segments)),
-    length(segments) == nrow(K0)
-  )
+  if(!all((is.matrix(K0) || methods::is(K0, "DelayedArray")),
+          (is.matrix(K1) || methods::is(K1, "DelayedArray")),
+          all(dim(K0) == dim(K1))))
+    stop("Wrong K0/K1 format")
+
 
   # --- Check colnames consistency ---
   if (!is.null(colnames(K0)) && !is.null(colnames(K1))) {
@@ -100,7 +98,7 @@ fuse.summary <- function(K0, K1, chr, pos, segments) {
   df2 <- rep(N, n_segments)
 
   # --- Compute p-values and stability flag (using base R) ---
-  pvals <- 1 - pchisq(-2 * (LL1 - LL2), df = df1 - df2)
+  pvals <- 1 - stats::pchisq(-2 * (LL1 - LL2), df = df1 - df2)
   coherent_flag <- pvals > 0.05
 
   # --- Compute average beta per segment ---
@@ -155,76 +153,7 @@ fuse.summary <- function(K0, K1, chr, pos, segments) {
 
 }
 
-#' Plot method for FUSE segmentation results
-#'
-#' @param x A fuse_summary object
-#' @param ... Additional arguments
-#' @param segments_to_plot Integer vector of segment indices
-#'
-#' @importFrom graphics grid abline points segments
-#' @export
-plot.fuse_summary <- function(x, ..., segments_to_plot = 1:50) {
 
-  # If default
-  if(identical(segments_to_plot, c(1:50))){
-    segments_to_plot <- 1:min(50, nrow(x$summary))
-  }
-
-  if(!(all(segments_to_plot %in% 1:nrow(x$summary)))) {
-    stop("segments_to_plot not in range")
-  }
-
-
-  summary <- x$summary[segments_to_plot, ]
-  betas <- x$betas_per_segment[segments_to_plot, , drop = FALSE]
-
-  betas_df <- data.frame(
-    beta = rowMeans(betas),
-    start = summary$Start,
-    end = summary$End
-  )
-
-  points_to_plot <- 1:sum(summary$CpGs)
-
-  points_df <- data.frame(
-    pos = x$raw_pos[points_to_plot],
-    beta = x$raw_beta[points_to_plot]
-    )
-
-  plot(
-    NA,
-    xlim = range(c(betas_df$start, betas_df$end)),
-    ylim = range(c(0,1)),
-    xlab = "Genomic Position",
-    ylab = "Beta",
-    main = "Segments"
-  )
-
-  grid()
-  abline(h = 0.5, col = "gray50", lty = 2, lwd = 1.5)
-
-  # --- NEW: raw CpG beta points ---
-  points(
-    points_df$pos,
-    points_df$beta,
-    col = "grey",
-    pch = 16
-
-  )
-
-  # Segment lines
-  for (i in seq_len(nrow(summary))) {
-    col <- if (betas_df$beta[i] > 0.5) "red" else "blue"
-    segments(
-      x0 = betas_df$start[i],
-      x1 = betas_df$end[i],
-      y0 = betas_df$beta[i],
-      y1 = betas_df$beta[i],
-      col = col,
-      lwd = 4
-    )
-  }
-}
 
 
 

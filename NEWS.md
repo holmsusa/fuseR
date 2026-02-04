@@ -19,7 +19,7 @@
 - Fixed S3 dispatch issues affecting `plot()` during vignette building.
 - Fixed lazy-load and installation issues caused by partial rebuilds.
 - Fixed edge cases in beta computation when counts sum to zero.
-# - Fixed the swapped TRUE/FALSE labels for coherent segments in `fuse.summary()`.
+- Fixed the swapped TRUE/FALSE labels for coherent segments in `fuse.summary()`.
 
 ---
 

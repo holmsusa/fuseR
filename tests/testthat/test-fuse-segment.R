@@ -1,4 +1,5 @@
 # fuse.segment
+# --------- End-to-end running and valid structure ----------------
 test_that("fuse.segment runs end-to-end and returns valid structure", {
   skip_if_not(exists("fuse.cluster"))
   skip_if_not(exists("number.of.clusters"))
@@ -21,6 +22,7 @@ test_that("fuse.segment runs end-to-end and returns valid structure", {
   expect_true(attr(res, "k_opt") > 0)
 })
 
+# --------- Handles invalid inputs ----------------
 test_that("fuse.segment handles invalid inputs gracefully", {
   K0 <- matrix(1:10, ncol = 2)
   K1 <- matrix(1:10, ncol = 2)
@@ -37,6 +39,23 @@ test_that("fuse.segment handles invalid inputs gracefully", {
   # Invalid method
   expect_error(fuse.segment(K0, K1, chr, pos, method = "XYZ"))
 })
+
+# --------- Works on matrix input  ----------------
+test_that("fuse.segment works on matrices", {
+  set.seed(1)
+  K0 <- matrix(sample(0:10, 200, TRUE), nrow = 50)
+  K1 <- matrix(sample(0:10, 200, TRUE), nrow = 50)
+
+  chr <- rep("chr1", 50)
+  pos <- seq_len(50)
+
+  res <- fuse.segment(K0, K1, chr, pos)
+
+  expect_s3_class(res, "fuse_summary")
+  expect_true(is.data.frame(res$summary))
+  expect_true(is.matrix(res$betas_per_segment))
+})
+
 
 
 

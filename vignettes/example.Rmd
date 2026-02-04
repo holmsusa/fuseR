@@ -15,7 +15,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ```{r}
 library(fuseR)
-```
+``` 
 
 ### Reading in data 
 We start by reading in the data, which consist of the tables K0 and K1. Both have CpG sites as rows and samples as columns, and 
@@ -48,7 +48,7 @@ segment_result <- fuse.segment(
   as.matrix(K0), 
   as.matrix(K1), 
   chr = sub("\\..*$", "", rownames(K0)), 
-  pos = as.numeric(sub("^.*\\.", "", rownames(K0))))
+  pos = as.integer(sub("^.*\\.", "", rownames(K0))))
 
 head(segment_result$summary)
 ```

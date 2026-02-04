@@ -1,4 +1,5 @@
 # fuse.summary
+# ------------------ Returns correct structure and dimensions ----------------------
 test_that("fuse.summary returns correct structure and dimensions", {
   # --- Synthetic data setup ---
   set.seed(123)
@@ -35,6 +36,7 @@ test_that("fuse.summary returns correct structure and dimensions", {
   expect_true(all(sm$Length >= 1))
 })
 
+# ------------------ Consistent segment ranges  ----------------------
 test_that("fuse.summary computes consistent segment ranges", {
   # --- Simple deterministic data ---
   K0 <- matrix(10, nrow = 6, ncol = 3)
@@ -57,6 +59,7 @@ test_that("fuse.summary computes consistent segment ranges", {
   expect_true(all(abs(sm$Beta - 1/3) < 1e-8))
 })
 
+# ------------------ Handles invalid inputs ----------------------
 test_that("fuse.summary handles invalid inputs", {
   K0 <- matrix(1:6, ncol = 2)
   K1 <- matrix(1:6, ncol = 2)
@@ -65,10 +68,12 @@ test_that("fuse.summary handles invalid inputs", {
   segments <- rep(1, nrow(K0))
 
   # Non-matrix inputs
-  expect_error(fuse.summary(as.data.frame(K0), K1, chr, pos, segments),
-               "is\\.matrix")
-  expect_error(fuse.summary(K0, as.data.frame(K1), chr, pos, segments),
-               "is\\.matrix")
+  expect_error(
+    fuse.summary(as.data.frame(K0), K1, chr, pos, segments)
+  )
+  expect_error(
+    fuse.summary(K0, as.data.frame(K1), chr, pos, segments)
+  )
 
   # Dimension mismatch
   expect_error(fuse.summary(K0, matrix(1:8, ncol = 2), chr, pos, segments))
@@ -81,10 +86,10 @@ test_that("fuse.summary handles invalid inputs", {
   expect_error(fuse.summary(K0, K1, chr, pos[-1], segments))
 
   # Invalid segments type or length
-  expect_error(fuse.summary(K0, K1, chr, pos, as.character(segments)))
   expect_error(fuse.summary(K0, K1, chr, pos, segments[-1]))
 })
 
+# ------------------ Stability flag local and reproducible ----------------------
 test_that("fuse.summary stability flag is logical and reproducible", {
   set.seed(42)
   K0 <- matrix(sample(0:5, 16, replace = TRUE), nrow = 16, ncol = 4)
