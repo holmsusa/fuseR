@@ -1,6 +1,6 @@
 Package: fuseR
 Title: Functional segmentation of the methylome
-Version: 1.0.0
+Version: 1.1.0
 Authors@R: 
     person("Susanna", "Holmström", , "susanna.k.holmstrom@helsinki.fi", role = c("aut", "cre"),
            comment = c(ORCID = "0009-0005-7542-5913"))
