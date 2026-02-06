@@ -14,5 +14,10 @@
 \item{segments_to_plot}{Integer vector of segment indices}
 }
 \description{
-Plot method for FUSE segmentation results
+Plotting method for fuse_summary.
+}
+\details{
+Raw CpG-level methylation values are shown as grey points.
+Segment-level methylation is shown as horizontal bars
+(red = hypermethylated, blue = hypomethylated).
 }

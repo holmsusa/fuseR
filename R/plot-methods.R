@@ -1,5 +1,13 @@
 #' Plot method for FUSE segmentation results
 #'
+#' @description
+#' Plotting method for fuse_summary.
+#'
+#' @details
+#' Raw CpG-level methylation values are shown as grey points.
+#' Segment-level methylation is shown as horizontal bars
+#' (red = hypermethylated, blue = hypomethylated).
+#'
 #' @param x A fuse_summary object
 #' @param ... Additional arguments
 #' @param segments_to_plot Integer vector of segment indices

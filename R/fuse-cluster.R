@@ -1,10 +1,19 @@
 #' Perform Hierarchical Clustering on Methylation Data
 #'
 #' @description Produces a hierarchical clustering tree based on the input matrices of counts.
-#' @param K0 Integer or numeric matrix with unmethylated counts
-#' @param K1 Integer or numeric matrix with methylated counts
-#' @param chr (Optional) Integer vector with chromosome info
-#' @param pos (Optional) Integer vector with genomic coordinate positions
+#' @param x Input object. One of:
+#' \describe{
+#'   \item{matrix}{Unmethylated count matrix (K0).}
+#'   \item{BSseq}{A \code{BSseq} object.}
+#'   \item{methrix}{A \code{methrix} object.}
+#' }
+#' @param ... K1 Integer or numeric matrix with methylated counts
+#' #' @param ... Additional arguments depending on input type:
+#' \describe{
+#'   \item{K1}{Methylated count matrix (required if \code{x} is a matrix).}
+#'   \item{chr}{(Optinal) Chromosome labels, one per CpG (matrix input only).}
+#'   \item{pos}{(Optional) positions, one per CpG (matrix input only).}
+#' }
 #'
 #' @return
 #' Clustering tree as a matrix, with the same structure as hclust, including the columns
@@ -31,10 +40,30 @@
 #' tree
 #'
 #' @export
-fuse.cluster <- function(K0, K1, chr = NULL, pos = NULL) {
+fuse.cluster <- function(x, ...) {
+  dots <- list(...)
+
+  # If matrix input and first unnamed arg exists → treat as K1
+  if (is.matrix(x) && length(dots) > 0 && is.null(names(dots)[1])) {
+    dots$K1 <- dots[[1]]
+    dots[[1]] <- NULL
+  }
+
+  UseMethod("fuse.cluster", x)
+}
+
+
+#' @rdname fuse.cluster
+#' @param K1 Methylated count matrix
+#' @param chr Optional chromosome vector
+#' @param pos Optional position vector
+#' @export
+fuse.cluster.default <- function(x, K1, chr = NULL, pos = NULL, ...) {
   # Produces a hierarchical clustering tree based on the input arrays.
   # Input: matrix K0, matrix K1
   # Output: matrix
+
+  K0 <- x
 
   # Checking input
   if(!all((is.matrix(K0) || methods::is(K0, "DelayedArray")),
@@ -56,7 +85,11 @@ fuse.cluster <- function(K0, K1, chr = NULL, pos = NULL) {
     pos <- seq_len(nrow(K0))
   }
 
-  if(!all(is.integer(chr.idx), length(chr.idx) == nrow(K0), is.integer(pos), length(pos) == nrow(K0))) stop("Wrong input for fuse_cluster_R")
+  if(!all(is.integer(chr.idx),
+          length(chr.idx) == nrow(K0),
+          is.integer(pos),
+          length(pos) == nrow(K0)))
+    stop("Wrong input for fuse_cluster_R")
 
   # All set, calling the fuse_cluster_R now
   tree <- .Call('fuse_cluster_R', K0, K1, chr.idx, pos)
@@ -64,4 +97,25 @@ fuse.cluster <- function(K0, K1, chr = NULL, pos = NULL) {
 
   return(`colnames<-`(tree, c("m1", "m2", "logl_tot", "logl_merge", "genomic_dist")))
 }
+
+
+#' @export
+fuse.cluster.matrix <- function(x, K1, chr = NULL, pos = NULL, ...) {
+
+  if (missing(K1) || is.null(K1)) {
+    stop("For matrix input, 'K1' must be supplied", call. = FALSE)
+  }
+
+  if (is.null(chr)) chr <- rep("chr1", nrow(x))
+  if (is.null(pos)) pos <- seq_len(nrow(x))
+
+  if (!all(dim(x) == dim(K1),
+           length(chr) == nrow(x),
+           length(pos) == nrow(x))) {
+    stop("Incorrect input dimensions", call. = FALSE)
+  }
+
+  fuse.cluster.default(x, K1, chr, pos)
+}
+
 

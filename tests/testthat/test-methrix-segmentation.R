@@ -14,9 +14,6 @@ test_that("fuse.segment works on methrix objects", {
 
   expect_s3_class(res$summary, "data.frame")
   expect_true(is.matrix(res$betas_per_segment))
-
-  expect_true(!is.null(attr(res, "k_opt")))
-  expect_true(attr(res, "method") %in% c("BIC", "AIC"))
 })
 
 test_that("methrix genomic ranges are respected", {

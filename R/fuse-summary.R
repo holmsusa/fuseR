@@ -116,12 +116,12 @@ fuse.summary <- function(K0, K1, chr, pos, segments) {
   # --- Combine into final summary data frame ---
   summary_df <- data.frame(
     Segment = paste(segment_chr, segment_start, sep = "."),
-    Chr = unlist(segment_chr),
-    Start = unlist(segment_start),
-    End = unlist(segment_end),
-    CpGs = segment_cpgs,
-    Length = segment_len,
-    Beta = beta_seg,
+    Chr = as.character(unlist(segment_chr)),
+    Start = as.integer(unlist(segment_start)),
+    End = as.integer(unlist(segment_end)),
+    CpGs = as.integer(segment_cpgs),
+    Length = as.integer(segment_len),
+    Beta = as.numeric(beta_seg),
     Coherent = coherent_flag
   )
 

@@ -20,3 +20,4 @@ test_that("fuse.segment works on BSseq objects", {
 
   expect_s3_class(res, "fuse_summary")
 })
+

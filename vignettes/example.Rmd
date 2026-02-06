@@ -1,7 +1,7 @@
 ---
 title: "Example workflow using FUSE"
 author: "Susanna Holmstrom"
-date: "2025-11-20"
+date: "2026-02-05"
 output:  rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{Example workflow using FUSE}
@@ -32,7 +32,6 @@ k1_file <- system.file("examples/k1.tsv.gz", package = "fuseR")
 K0 <- read.table(k0_file, header = TRUE)
 K1 <- read.table(k1_file, header = TRUE)
 
-
 head(K0)
 ```
 ### Apply FUSE as a pipeline
@@ -45,10 +44,12 @@ The whole FUSE pipeline can be applied using the function 'fuse.segment()'. It p
 The function takes as input the count matrices K0 and K1 and the chromosome and position information for each CpG site, and outputs a summary table and a data frame with betas. 
 ```{r}
 segment_result <- fuse.segment(
-  as.matrix(K0), 
-  as.matrix(K1), 
-  chr = sub("\\..*$", "", rownames(K0)), 
-  pos = as.integer(sub("^.*\\.", "", rownames(K0))))
+  as.matrix(K0),
+  as.matrix(K1),
+  chr = sub("\\..*$", "", rownames(K0)),
+  pos = as.integer(sub("^.*\\.", "", rownames(K0))),
+  method = "BIC"
+)
 
 head(segment_result$summary)
 ```
@@ -62,6 +63,44 @@ plot(segment_result, segments_to_plot = 1:nrow(segment_result$summary))
 plot(segment_result, segments_to_plot = 50:60)
 ``` 
 
+## Using BSseq or methrix
+The 'fuse.segment()' function accepts as input also a BSseq or a methrix object. 
+
+```{r bsseq-example, eval = requireNamespace("bsseq", quietly = TRUE)}
+library(bsseq)
+
+set.seed(1)
+M <- matrix(c(sample(0:10, 1000, TRUE),
+              sample(50:60, 1000, TRUE),
+              sample(0:10, 1000, TRUE),
+              sample(20:30, 1000, TRUE))
+            , nrow = 1000, byrow = T)
+Cov <- M + matrix(sample(50:60, 4000, TRUE), nrow = 1000)
+  
+  
+bs <- BSseq(
+    chr = rep("chr1", 1000),
+    pos = seq_len(1000),
+    M = M,
+    Cov = Cov,
+    sampleNames = colnames(M)
+  )
+
+res <- fuse.segment(bs)
+head(res$summary)
+```
+
+```{r methrix-example, eval = requireNamespace("methrix", quietly = TRUE)}
+library(methrix)
+
+data(methrix_data, package = "methrix")
+
+res <- fuse.segment(methrix_data)
+head(res$summary)
+
+```
+
+
 ## Apply FUSE through separate steps
 If the intermediate outputs of the method are relevant, then the pipeline can also be applied by calling each of the functions 'fuse.cluster()', 'number.of.clusters()', 'fuse.cut.tree()', and 'fuse.summary()' separately. 
 
@@ -69,7 +108,10 @@ If the intermediate outputs of the method are relevant, then the pipeline can al
 In the first step, 'fuse.cluster()' is applied on the count matrices. This performs a hierarchical clustering of closest neighbors, and outputs a clustering tree.
 
 ```{r}
-tree <- fuse.cluster(as.matrix(K0), as.matrix(K1))
+tree <- fuse.cluster(as.matrix(K0), 
+                     as.matrix(K1),
+                     chr = sub("\\..*$", "", rownames(K0)), 
+                     pos = as.integer(sub("^.*\\.", "", rownames(K0))))
 head(tree)
 ```
 

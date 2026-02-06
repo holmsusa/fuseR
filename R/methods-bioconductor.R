@@ -44,6 +44,8 @@
 }
 
 
+#' @rdname fuse.segment
+#' @method fuse.segment BSseq
 #' @export
 fuse.segment.BSseq <- function(x, method = c("BIC", "AIC"), ...) {
   if (!requireNamespace("bsseq", quietly = TRUE)) {
@@ -65,6 +67,8 @@ fuse.segment.BSseq <- function(x, method = c("BIC", "AIC"), ...) {
   )
 }
 
+#' @rdname fuse.segment
+#' @method fuse.segment methrix
 #' @export
 fuse.segment.methrix <- function(x, method = c("BIC", "AIC"), ...) {
   if (!requireNamespace("methrix", quietly = TRUE)) {
@@ -85,5 +89,49 @@ fuse.segment.methrix <- function(x, method = c("BIC", "AIC"), ...) {
     method = method
   )
 }
+
+#' @rdname fuse.cluster
+#' @method fuse.cluster BSseq
+#' @export
+fuse.cluster.BSseq <- function(x, ...) {
+  if (!requireNamespace("bsseq", quietly = TRUE)) {
+    stop(
+      "BSseq support requires the 'bsseq' package.",
+      call. = FALSE
+    )
+  }
+
+  inputs <- .get_fuse_inputs(x)
+
+  fuse.cluster.default(
+    x   = inputs$K0,
+    K1  = inputs$K1,
+    chr = inputs$chr,
+    pos = as.integer(inputs$pos)
+  )
+}
+
+
+#' @rdname fuse.cluster
+#' @method fuse.cluster methrix
+#' @export
+fuse.cluster.methrix <- function(x, ...) {
+  if (!requireNamespace("methrix", quietly = TRUE)) {
+    stop(
+      "methrix support requires the 'methrix' package.",
+      call. = FALSE
+    )
+  }
+
+  inputs <- .get_fuse_inputs(x)
+
+  fuse.cluster.default(
+    x   = inputs$K0,
+    K1  = inputs$K1,
+    chr = inputs$chr,
+    pos = as.integer(inputs$pos)
+  )
+}
+
 
 
