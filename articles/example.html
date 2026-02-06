@@ -54,7 +54,7 @@
                         <h4 data-toc-skip class="author">Susanna
 Holmstrom</h4>
             
-            <h4 data-toc-skip class="date">2025-11-20</h4>
+            <h4 data-toc-skip class="date">2026-02-05</h4>
       
 
       <div class="d-none name"><code>example.Rmd</code></div>
@@ -81,7 +81,6 @@ K1. Both have CpG sites as rows and samples as columns, and</p>
 <span></span>
 <span><span class="va">K0</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/utils/read.table.html" class="external-link">read.table</a></span><span class="op">(</span><span class="va">k0_file</span>, header <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="va">K1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/utils/read.table.html" class="external-link">read.table</a></span><span class="op">(</span><span class="va">k1_file</span>, header <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
-<span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">K0</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">##             Sample1 Sample2 Sample3 Sample4 Sample5 Sample6 Sample7 Sample8</span></span>
@@ -121,10 +120,12 @@ chromosome and position information for each CpG site, and outputs a
 summary table and a data frame with betas.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">segment_result</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fuse.segment.html">fuse.segment</a></span><span class="op">(</span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">as.matrix</a></span><span class="op">(</span><span class="va">K0</span><span class="op">)</span>, </span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">as.matrix</a></span><span class="op">(</span><span class="va">K1</span><span class="op">)</span>, </span>
-<span>  chr <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">sub</a></span><span class="op">(</span><span class="st">"\\..*$"</span>, <span class="st">""</span>, <span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">rownames</a></span><span class="op">(</span><span class="va">K0</span><span class="op">)</span><span class="op">)</span>, </span>
-<span>  pos <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/integer.html" class="external-link">as.integer</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">sub</a></span><span class="op">(</span><span class="st">"^.*\\."</span>, <span class="st">""</span>, <span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">rownames</a></span><span class="op">(</span><span class="va">K0</span><span class="op">)</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">as.matrix</a></span><span class="op">(</span><span class="va">K0</span><span class="op">)</span>,</span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">as.matrix</a></span><span class="op">(</span><span class="va">K1</span><span class="op">)</span>,</span>
+<span>  chr <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">sub</a></span><span class="op">(</span><span class="st">"\\..*$"</span>, <span class="st">""</span>, <span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">rownames</a></span><span class="op">(</span><span class="va">K0</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>  pos <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/integer.html" class="external-link">as.integer</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">sub</a></span><span class="op">(</span><span class="st">"^.*\\."</span>, <span class="st">""</span>, <span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">rownames</a></span><span class="op">(</span><span class="va">K0</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>  method <span class="op">=</span> <span class="st">"BIC"</span></span>
+<span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">segment_result</span><span class="op">$</span><span class="va">summary</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">##       Segment   Chr Start   End CpGs Length      Beta Coherent</span></span>
@@ -171,6 +172,137 @@ summary table and a data frame with betas.</p>
 <p><img src="example_files/figure-html/unnamed-chunk-5-1.png" class="r-plt" alt="" width="768"></p>
 </div>
 <div class="section level2">
+<h2 id="using-bsseq-or-methrix">Using BSseq or methrix<a class="anchor" aria-label="anchor" href="#using-bsseq-or-methrix"></a>
+</h2>
+<p>The ‘fuse.segment()’ function accepts as input also a BSseq or a
+methrix object.</p>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/kasperdanielhansen/bsseq" class="external-link">bsseq</a></span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## Loading required package: BiocGenerics</span></span></code></pre>
+<pre><code><span><span class="co">## Loading required package: generics</span></span></code></pre>
+<pre><code><span><span class="co">## </span></span>
+<span><span class="co">## Attaching package: 'generics'</span></span></code></pre>
+<pre><code><span><span class="co">## The following objects are masked from 'package:base':</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">##     as.difftime, as.factor, as.ordered, intersect, is.element, setdiff,</span></span>
+<span><span class="co">##     setequal, union</span></span></code></pre>
+<pre><code><span><span class="co">## </span></span>
+<span><span class="co">## Attaching package: 'BiocGenerics'</span></span></code></pre>
+<pre><code><span><span class="co">## The following objects are masked from 'package:stats':</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">##     IQR, mad, sd, var, xtabs</span></span></code></pre>
+<pre><code><span><span class="co">## The following objects are masked from 'package:base':</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">##     anyDuplicated, aperm, append, as.data.frame, basename, cbind,</span></span>
+<span><span class="co">##     colnames, dirname, do.call, duplicated, eval, evalq, Filter, Find,</span></span>
+<span><span class="co">##     get, grep, grepl, is.unsorted, lapply, Map, mapply, match, mget,</span></span>
+<span><span class="co">##     order, paste, pmax, pmax.int, pmin, pmin.int, Position, rank,</span></span>
+<span><span class="co">##     rbind, Reduce, rownames, sapply, saveRDS, table, tapply, unique,</span></span>
+<span><span class="co">##     unsplit, which.max, which.min</span></span></code></pre>
+<pre><code><span><span class="co">## Loading required package: GenomicRanges</span></span></code></pre>
+<pre><code><span><span class="co">## Loading required package: stats4</span></span></code></pre>
+<pre><code><span><span class="co">## Loading required package: S4Vectors</span></span></code></pre>
+<pre><code><span><span class="co">## </span></span>
+<span><span class="co">## Attaching package: 'S4Vectors'</span></span></code></pre>
+<pre><code><span><span class="co">## The following object is masked from 'package:utils':</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">##     findMatches</span></span></code></pre>
+<pre><code><span><span class="co">## The following objects are masked from 'package:base':</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">##     expand.grid, I, unname</span></span></code></pre>
+<pre><code><span><span class="co">## Loading required package: IRanges</span></span></code></pre>
+<pre><code><span><span class="co">## Loading required package: Seqinfo</span></span></code></pre>
+<pre><code><span><span class="co">## Loading required package: SummarizedExperiment</span></span></code></pre>
+<pre><code><span><span class="co">## Loading required package: MatrixGenerics</span></span></code></pre>
+<pre><code><span><span class="co">## Loading required package: matrixStats</span></span></code></pre>
+<pre><code><span><span class="co">## </span></span>
+<span><span class="co">## Attaching package: 'MatrixGenerics'</span></span></code></pre>
+<pre><code><span><span class="co">## The following objects are masked from 'package:matrixStats':</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">##     colAlls, colAnyNAs, colAnys, colAvgsPerRowSet, colCollapse,</span></span>
+<span><span class="co">##     colCounts, colCummaxs, colCummins, colCumprods, colCumsums,</span></span>
+<span><span class="co">##     colDiffs, colIQRDiffs, colIQRs, colLogSumExps, colMadDiffs,</span></span>
+<span><span class="co">##     colMads, colMaxs, colMeans2, colMedians, colMins, colOrderStats,</span></span>
+<span><span class="co">##     colProds, colQuantiles, colRanges, colRanks, colSdDiffs, colSds,</span></span>
+<span><span class="co">##     colSums2, colTabulates, colVarDiffs, colVars, colWeightedMads,</span></span>
+<span><span class="co">##     colWeightedMeans, colWeightedMedians, colWeightedSds,</span></span>
+<span><span class="co">##     colWeightedVars, rowAlls, rowAnyNAs, rowAnys, rowAvgsPerColSet,</span></span>
+<span><span class="co">##     rowCollapse, rowCounts, rowCummaxs, rowCummins, rowCumprods,</span></span>
+<span><span class="co">##     rowCumsums, rowDiffs, rowIQRDiffs, rowIQRs, rowLogSumExps,</span></span>
+<span><span class="co">##     rowMadDiffs, rowMads, rowMaxs, rowMeans2, rowMedians, rowMins,</span></span>
+<span><span class="co">##     rowOrderStats, rowProds, rowQuantiles, rowRanges, rowRanks,</span></span>
+<span><span class="co">##     rowSdDiffs, rowSds, rowSums2, rowTabulates, rowVarDiffs, rowVars,</span></span>
+<span><span class="co">##     rowWeightedMads, rowWeightedMeans, rowWeightedMedians,</span></span>
+<span><span class="co">##     rowWeightedSds, rowWeightedVars</span></span></code></pre>
+<pre><code><span><span class="co">## Loading required package: Biobase</span></span></code></pre>
+<pre><code><span><span class="co">## Welcome to Bioconductor</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">##     Vignettes contain introductory material; view with</span></span>
+<span><span class="co">##     'browseVignettes()'. To cite Bioconductor, see</span></span>
+<span><span class="co">##     'citation("Biobase")', and for packages 'citation("pkgname")'.</span></span></code></pre>
+<pre><code><span><span class="co">## </span></span>
+<span><span class="co">## Attaching package: 'Biobase'</span></span></code></pre>
+<pre><code><span><span class="co">## The following object is masked from 'package:MatrixGenerics':</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">##     rowMedians</span></span></code></pre>
+<pre><code><span><span class="co">## The following objects are masked from 'package:matrixStats':</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">##     anyMissing, rowMedians</span></span></code></pre>
+<div class="sourceCode" id="cb35"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span>
+<span><span class="va">M</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/sample.html" class="external-link">sample</a></span><span class="op">(</span><span class="fl">0</span><span class="op">:</span><span class="fl">10</span>, <span class="fl">1000</span>, <span class="cn">TRUE</span><span class="op">)</span>,</span>
+<span>              <span class="fu"><a href="https://rdrr.io/r/base/sample.html" class="external-link">sample</a></span><span class="op">(</span><span class="fl">50</span><span class="op">:</span><span class="fl">60</span>, <span class="fl">1000</span>, <span class="cn">TRUE</span><span class="op">)</span>,</span>
+<span>              <span class="fu"><a href="https://rdrr.io/r/base/sample.html" class="external-link">sample</a></span><span class="op">(</span><span class="fl">0</span><span class="op">:</span><span class="fl">10</span>, <span class="fl">1000</span>, <span class="cn">TRUE</span><span class="op">)</span>,</span>
+<span>              <span class="fu"><a href="https://rdrr.io/r/base/sample.html" class="external-link">sample</a></span><span class="op">(</span><span class="fl">20</span><span class="op">:</span><span class="fl">30</span>, <span class="fl">1000</span>, <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></span>
+<span>            , nrow <span class="op">=</span> <span class="fl">1000</span>, byrow <span class="op">=</span> <span class="cn">T</span><span class="op">)</span></span>
+<span><span class="va">Cov</span> <span class="op">&lt;-</span> <span class="va">M</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/sample.html" class="external-link">sample</a></span><span class="op">(</span><span class="fl">50</span><span class="op">:</span><span class="fl">60</span>, <span class="fl">4000</span>, <span class="cn">TRUE</span><span class="op">)</span>, nrow <span class="op">=</span> <span class="fl">1000</span><span class="op">)</span></span>
+<span>  </span>
+<span>  </span>
+<span><span class="va">bs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/bsseq/man/BSseq.html" class="external-link">BSseq</a></span><span class="op">(</span></span>
+<span>    chr <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">"chr1"</span>, <span class="fl">1000</span><span class="op">)</span>,</span>
+<span>    pos <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_len</a></span><span class="op">(</span><span class="fl">1000</span><span class="op">)</span>,</span>
+<span>    M <span class="op">=</span> <span class="va">M</span>,</span>
+<span>    Cov <span class="op">=</span> <span class="va">Cov</span>,</span>
+<span>    sampleNames <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/BiocGenerics/man/row_colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">M</span><span class="op">)</span></span>
+<span>  <span class="op">)</span></span>
+<span></span>
+<span><span class="va">res</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fuse.segment.html">fuse.segment</a></span><span class="op">(</span><span class="va">bs</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">res</span><span class="op">$</span><span class="va">summary</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">##    Segment  Chr Start  End CpGs Length       Beta Coherent</span></span>
+<span><span class="co">## 1   chr1.1 chr1     1  250  250    250 0.08344157    FALSE</span></span>
+<span><span class="co">## 2 chr1.251 chr1   251  500  250    250 0.50035855     TRUE</span></span>
+<span><span class="co">## 3 chr1.501 chr1   501  750  250    250 0.08405464    FALSE</span></span>
+<span><span class="co">## 4 chr1.751 chr1   751 1000  250    250 0.31483887     TRUE</span></span></code></pre>
+<div class="sourceCode" id="cb37"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/CompEpigen/methrix" class="external-link">methrix</a></span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## Loading required package: data.table</span></span></code></pre>
+<pre><code><span><span class="co">## </span></span>
+<span><span class="co">## Attaching package: 'data.table'</span></span></code></pre>
+<pre><code><span><span class="co">## The following object is masked from 'package:SummarizedExperiment':</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">##     shift</span></span></code></pre>
+<pre><code><span><span class="co">## The following object is masked from 'package:GenomicRanges':</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">##     shift</span></span></code></pre>
+<pre><code><span><span class="co">## The following object is masked from 'package:IRanges':</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">##     shift</span></span></code></pre>
+<pre><code><span><span class="co">## The following objects are masked from 'package:S4Vectors':</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">##     first, second</span></span></code></pre>
+<div class="sourceCode" id="cb44"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">methrix_data</span>, package <span class="op">=</span> <span class="st">"methrix"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">res</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fuse.segment.html">fuse.segment</a></span><span class="op">(</span><span class="va">methrix_data</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">res</span><span class="op">$</span><span class="va">summary</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">##          Segment   Chr    Start      End CpGs   Length       Beta Coherent</span></span>
+<span><span class="co">## 1 chr21.27866423 chr21 27866423 47286854   82 19420432 0.09796720     TRUE</span></span>
+<span><span class="co">## 2 chr21.47286962 chr21 47286962 47517454  118   230493 0.16972343     TRUE</span></span>
+<span><span class="co">## 3 chr21.47517456 chr21 47517456 47520741  211     3286 0.05453577     TRUE</span></span>
+<span><span class="co">## 4 chr21.47536415 chr21 47536415 47540455  129     4041 0.11761019     TRUE</span></span>
+<span><span class="co">## 5 chr22.45083239 chr22 45083239 49007398  203  3924160 0.13991860     TRUE</span></span></code></pre>
+</div>
+<div class="section level2">
 <h2 id="apply-fuse-through-separate-steps">Apply FUSE through separate steps<a class="anchor" aria-label="anchor" href="#apply-fuse-through-separate-steps"></a>
 </h2>
 <p>If the intermediate outputs of the method are relevant, then the
@@ -183,16 +315,19 @@ pipeline can also be applied by calling each of the functions
 <p>In the first step, ‘fuse.cluster()’ is applied on the count matrices.
 This performs a hierarchical clustering of closest neighbors, and
 outputs a clustering tree.</p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">tree</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fuse.cluster.html">fuse.cluster</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">as.matrix</a></span><span class="op">(</span><span class="va">K0</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">as.matrix</a></span><span class="op">(</span><span class="va">K1</span><span class="op">)</span><span class="op">)</span></span>
+<div class="sourceCode" id="cb46"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">tree</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fuse.cluster.html">fuse.cluster</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">as.matrix</a></span><span class="op">(</span><span class="va">K0</span><span class="op">)</span>, </span>
+<span>                     <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">as.matrix</a></span><span class="op">(</span><span class="va">K1</span><span class="op">)</span>,</span>
+<span>                     chr <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">sub</a></span><span class="op">(</span><span class="st">"\\..*$"</span>, <span class="st">""</span>, <span class="fu"><a href="https://rdrr.io/pkg/BiocGenerics/man/row_colnames.html" class="external-link">rownames</a></span><span class="op">(</span><span class="va">K0</span><span class="op">)</span><span class="op">)</span>, </span>
+<span>                     pos <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/integer.html" class="external-link">as.integer</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">sub</a></span><span class="op">(</span><span class="st">"^.*\\."</span>, <span class="st">""</span>, <span class="fu"><a href="https://rdrr.io/pkg/BiocGenerics/man/row_colnames.html" class="external-link">rownames</a></span><span class="op">(</span><span class="va">K0</span><span class="op">)</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">tree</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">##          m1     m2 logl_tot logl_merge genomic_dist</span></span>
-<span><span class="co">## [1,] -45579 -45580 10.65993   10.65993      1.14483</span></span>
-<span><span class="co">## [2,] -49658 -49659 12.57786   12.57786      1.14483</span></span>
-<span><span class="co">## [3,] -57737 -57738 12.62932   12.62932      1.14483</span></span>
-<span><span class="co">## [4,] -46190 -46191 12.70708   12.70708      1.14483</span></span>
-<span><span class="co">## [5,] -23937 -23938 16.63625   16.63625      1.14483</span></span>
-<span><span class="co">## [6,] -88318 -88319 16.75105   16.75105      1.14483</span></span></code></pre>
+<span><span class="co">## [1,] -45579 -45580 10.65993   10.65993     1.144830</span></span>
+<span><span class="co">## [2,] -57737 -57738 12.62932   12.62932     1.144830</span></span>
+<span><span class="co">## [3,] -46190 -46191 12.70708   12.70708     1.176616</span></span>
+<span><span class="co">## [4,] -49658 -49659 12.57786   12.57786     1.877867</span></span>
+<span><span class="co">## [5,] -23937 -23938 16.63625   16.63625     1.144830</span></span>
+<span><span class="co">## [6,] -41560 -41561 17.26477   17.26477     1.146329</span></span></code></pre>
 <p>The clustering ‘tree’ contains the following columns:</p>
 <ul>
 <li>‘m1’: the label of the first merged point</li>
@@ -211,15 +346,15 @@ needs to be calculated. For this we have the function
 ‘number.of.clusters()’, which performs model selection by minimizing
 either the Bayesian Information Criterion (BIC, default), or the Akaike
 Information Criterion (AIC).</p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb48"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Need the total likelihood per model, which is sum of likelihood changes</span></span>
 <span><span class="va">tree</span><span class="op">[</span>,<span class="fl">3</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cumsum.html" class="external-link">cumsum</a></span><span class="op">(</span><span class="va">tree</span><span class="op">[</span>,<span class="fl">3</span><span class="op">]</span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">optimal_num_of_segments</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/number.of.clusters.html">number.of.clusters</a></span><span class="op">(</span><span class="va">tree</span>, <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">ncol</a></span><span class="op">(</span><span class="va">K0</span><span class="op">)</span>, <span class="st">'BIC'</span><span class="op">)</span></span>
+<span><span class="va">optimal_num_of_segments</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/number.of.clusters.html">number.of.clusters</a></span><span class="op">(</span><span class="va">tree</span>, <span class="fu"><a href="https://rdrr.io/pkg/BiocGenerics/man/nrow.html" class="external-link">ncol</a></span><span class="op">(</span><span class="va">K0</span><span class="op">)</span>, <span class="st">'BIC'</span><span class="op">)</span></span>
 <span><span class="va">optimal_num_of_segments</span></span></code></pre></div>
-<pre><code><span><span class="co">## [1] 9027</span></span></code></pre>
+<pre><code><span><span class="co">## [1] 9030</span></span></code></pre>
 <p>The tree can then be cut using ‘fuse.cut.tree()’</p>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb50"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">segments</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fuse.cut.tree.html">fuse.cut.tree</a></span><span class="op">(</span><span class="va">tree</span>, <span class="va">optimal_num_of_segments</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">segments</span>, <span class="fl">100</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">##   [1] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 2 2 2 2 2 2 2 2 2 2 2 2 3 3 3 3 3 3 3 3</span></span>
@@ -231,11 +366,11 @@ Information Criterion (AIC).</p>
 </h3>
 <p>The segments can be summarized in a table with the function
 ‘fuse.summary()’.</p>
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb52"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fuse.summary.html">fuse.summary</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">as.matrix</a></span><span class="op">(</span><span class="va">K0</span><span class="op">)</span>, </span>
 <span>                       <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">as.matrix</a></span><span class="op">(</span><span class="va">K1</span><span class="op">)</span>, </span>
-<span>                       chr <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">sub</a></span><span class="op">(</span><span class="st">"\\..*$"</span>, <span class="st">""</span>, <span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">rownames</a></span><span class="op">(</span><span class="va">K0</span><span class="op">)</span><span class="op">)</span>, </span>
-<span>                       pos <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">sub</a></span><span class="op">(</span><span class="st">"^.*\\."</span>, <span class="st">""</span>, <span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">rownames</a></span><span class="op">(</span><span class="va">K0</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>, </span>
+<span>                       chr <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">sub</a></span><span class="op">(</span><span class="st">"\\..*$"</span>, <span class="st">""</span>, <span class="fu"><a href="https://rdrr.io/pkg/BiocGenerics/man/row_colnames.html" class="external-link">rownames</a></span><span class="op">(</span><span class="va">K0</span><span class="op">)</span><span class="op">)</span>, </span>
+<span>                       pos <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">sub</a></span><span class="op">(</span><span class="st">"^.*\\."</span>, <span class="st">""</span>, <span class="fu"><a href="https://rdrr.io/pkg/BiocGenerics/man/row_colnames.html" class="external-link">rownames</a></span><span class="op">(</span><span class="va">K0</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>, </span>
 <span>                       <span class="va">segments</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">result</span><span class="op">$</span><span class="va">summary</span><span class="op">)</span></span></code></pre></div>
@@ -246,7 +381,7 @@ Information Criterion (AIC).</p>
 <span><span class="co">## 4 chr20.63863 chr20 63863 64424   13    562 0.8565943    FALSE</span></span>
 <span><span class="co">## 5 chr20.64609 chr20 64609 64728    6    120 0.6418476    FALSE</span></span>
 <span><span class="co">## 6 chr20.64778 chr20 64778 65365    6    588 0.1449167    FALSE</span></span></code></pre>
-<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb54"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">result</span><span class="op">$</span><span class="va">betas_per_segment</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">##               Sample1   Sample2   Sample3    Sample4   Sample5    Sample6</span></span>
 <span><span class="co">## chr20.60008 0.7331288 0.7795786 0.8133333 0.84156977 0.7853659 0.81250000</span></span>
@@ -281,19 +416,19 @@ Information Criterion (AIC).</p>
 <h3 id="verification">Verification<a class="anchor" aria-label="anchor" href="#verification"></a>
 </h3>
 <p>The outputs are identical.</p>
-<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb56"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/identical.html" class="external-link">identical</a></span><span class="op">(</span><span class="va">segment_result</span><span class="op">$</span><span class="va">summary</span>, <span class="va">result</span><span class="op">$</span><span class="va">summary</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## [1] FALSE</span></span></code></pre>
-<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
+<pre><code><span><span class="co">## [1] TRUE</span></span></code></pre>
+<div class="sourceCode" id="cb58"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/identical.html" class="external-link">identical</a></span><span class="op">(</span><span class="va">segment_result</span><span class="op">$</span><span class="va">betas_per_segment</span>, <span class="va">result</span><span class="op">$</span><span class="va">betas_per_segment</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## [1] FALSE</span></span></code></pre>
+<pre><code><span><span class="co">## [1] TRUE</span></span></code></pre>
 </div>
 </div>
 <div class="section level2">
 <h2 id="plotting">Plotting<a class="anchor" aria-label="anchor" href="#plotting"></a>
 </h2>
 <p>Let’s visualize a small piece of the result:</p>
-<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb60"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">result</span>, segments_to_plot <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">50</span><span class="op">)</span></span></code></pre></div>
 <p><img src="example_files/figure-html/unnamed-chunk-13-1.png" class="r-plt" alt="" width="768"></p>
 </div>

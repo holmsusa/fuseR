@@ -39,27 +39,61 @@
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">fuse.cluster</span><span class="op">(</span><span class="va">K0</span>, <span class="va">K1</span>, chr <span class="op">=</span> <span class="cn">NULL</span>, pos <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">fuse.cluster</span><span class="op">(</span><span class="va">x</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Default S3 method</span></span>
+<span><span class="fu">fuse.cluster</span><span class="op">(</span><span class="va">x</span>, <span class="va">K1</span>, chr <span class="op">=</span> <span class="cn">NULL</span>, pos <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for class 'BSseq'</span></span>
+<span><span class="fu">fuse.cluster</span><span class="op">(</span><span class="va">x</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for class 'methrix'</span></span>
+<span><span class="fu">fuse.cluster</span><span class="op">(</span><span class="va">x</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
     <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
 
 
-<dl><dt id="arg-k-">K0<a class="anchor" aria-label="anchor" href="#arg-k-"></a></dt>
-<dd><p>Integer or numeric matrix with unmethylated counts</p></dd>
+<dl><dt id="arg-x">x<a class="anchor" aria-label="anchor" href="#arg-x"></a></dt>
+<dd><p>Input object. One of:</p><dl><dt>matrix</dt>
+<dd><p>Unmethylated count matrix (K0).</p></dd>
+
+<dt>BSseq</dt>
+<dd><p>A <code>BSseq</code> object.</p></dd>
+
+<dt>methrix</dt>
+<dd><p>A <code>methrix</code> object.</p></dd>
+
+
+</dl></dd>
+
+
+<dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
+<dd><p>K1 Integer or numeric matrix with methylated counts
+#' @param ... Additional arguments depending on input type:</p><dl><dt>K1</dt>
+<dd><p>Methylated count matrix (required if <code>x</code> is a matrix).</p></dd>
+
+<dt>chr</dt>
+<dd><p>(Optinal) Chromosome labels, one per CpG (matrix input only).</p></dd>
+
+<dt>pos</dt>
+<dd><p>(Optional) positions, one per CpG (matrix input only).</p></dd>
+
+
+</dl></dd>
 
 
 <dt id="arg-k-">K1<a class="anchor" aria-label="anchor" href="#arg-k-"></a></dt>
-<dd><p>Integer or numeric matrix with methylated counts</p></dd>
+<dd><p>Methylated count matrix</p></dd>
 
 
 <dt id="arg-chr">chr<a class="anchor" aria-label="anchor" href="#arg-chr"></a></dt>
-<dd><p>(Optional) Integer vector with chromosome info</p></dd>
+<dd><p>Optional chromosome vector</p></dd>
 
 
 <dt id="arg-pos">pos<a class="anchor" aria-label="anchor" href="#arg-pos"></a></dt>
-<dd><p>(Optional) Integer vector with genomic coordinate positions</p></dd>
+<dd><p>Optional position vector</p></dd>
 
 </dl></div>
     <div class="section level2">

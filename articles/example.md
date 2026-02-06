@@ -22,7 +22,6 @@ k1_file <- system.file("examples/k1.tsv.gz", package = "fuseR")
 K0 <- read.table(k0_file, header = TRUE)
 K1 <- read.table(k1_file, header = TRUE)
 
-
 head(K0)
 ```
 
@@ -63,10 +62,12 @@ summary table and a data frame with betas.
 
 ``` r
 segment_result <- fuse.segment(
-  as.matrix(K0), 
-  as.matrix(K1), 
-  chr = sub("\\..*$", "", rownames(K0)), 
-  pos = as.integer(sub("^.*\\.", "", rownames(K0))))
+  as.matrix(K0),
+  as.matrix(K1),
+  chr = sub("\\..*$", "", rownames(K0)),
+  pos = as.integer(sub("^.*\\.", "", rownames(K0))),
+  method = "BIC"
+)
 
 head(segment_result$summary)
 ```
@@ -120,6 +121,177 @@ plot(segment_result, segments_to_plot = 50:60)
 
 ![](example_files/figure-html/unnamed-chunk-5-1.png)
 
+## Using BSseq or methrix
+
+The ‘fuse.segment()’ function accepts as input also a BSseq or a methrix
+object.
+
+``` r
+library(bsseq)
+```
+
+    ## Loading required package: BiocGenerics
+
+    ## Loading required package: generics
+
+    ## 
+    ## Attaching package: 'generics'
+
+    ## The following objects are masked from 'package:base':
+    ## 
+    ##     as.difftime, as.factor, as.ordered, intersect, is.element, setdiff,
+    ##     setequal, union
+
+    ## 
+    ## Attaching package: 'BiocGenerics'
+
+    ## The following objects are masked from 'package:stats':
+    ## 
+    ##     IQR, mad, sd, var, xtabs
+
+    ## The following objects are masked from 'package:base':
+    ## 
+    ##     anyDuplicated, aperm, append, as.data.frame, basename, cbind,
+    ##     colnames, dirname, do.call, duplicated, eval, evalq, Filter, Find,
+    ##     get, grep, grepl, is.unsorted, lapply, Map, mapply, match, mget,
+    ##     order, paste, pmax, pmax.int, pmin, pmin.int, Position, rank,
+    ##     rbind, Reduce, rownames, sapply, saveRDS, table, tapply, unique,
+    ##     unsplit, which.max, which.min
+
+    ## Loading required package: GenomicRanges
+
+    ## Loading required package: stats4
+
+    ## Loading required package: S4Vectors
+
+    ## 
+    ## Attaching package: 'S4Vectors'
+
+    ## The following object is masked from 'package:utils':
+    ## 
+    ##     findMatches
+
+    ## The following objects are masked from 'package:base':
+    ## 
+    ##     expand.grid, I, unname
+
+    ## Loading required package: IRanges
+
+    ## Loading required package: Seqinfo
+
+    ## Loading required package: SummarizedExperiment
+
+    ## Loading required package: MatrixGenerics
+
+    ## Loading required package: matrixStats
+
+    ## 
+    ## Attaching package: 'MatrixGenerics'
+
+    ## The following objects are masked from 'package:matrixStats':
+    ## 
+    ##     colAlls, colAnyNAs, colAnys, colAvgsPerRowSet, colCollapse,
+    ##     colCounts, colCummaxs, colCummins, colCumprods, colCumsums,
+    ##     colDiffs, colIQRDiffs, colIQRs, colLogSumExps, colMadDiffs,
+    ##     colMads, colMaxs, colMeans2, colMedians, colMins, colOrderStats,
+    ##     colProds, colQuantiles, colRanges, colRanks, colSdDiffs, colSds,
+    ##     colSums2, colTabulates, colVarDiffs, colVars, colWeightedMads,
+    ##     colWeightedMeans, colWeightedMedians, colWeightedSds,
+    ##     colWeightedVars, rowAlls, rowAnyNAs, rowAnys, rowAvgsPerColSet,
+    ##     rowCollapse, rowCounts, rowCummaxs, rowCummins, rowCumprods,
+    ##     rowCumsums, rowDiffs, rowIQRDiffs, rowIQRs, rowLogSumExps,
+    ##     rowMadDiffs, rowMads, rowMaxs, rowMeans2, rowMedians, rowMins,
+    ##     rowOrderStats, rowProds, rowQuantiles, rowRanges, rowRanks,
+    ##     rowSdDiffs, rowSds, rowSums2, rowTabulates, rowVarDiffs, rowVars,
+    ##     rowWeightedMads, rowWeightedMeans, rowWeightedMedians,
+    ##     rowWeightedSds, rowWeightedVars
+
+    ## Loading required package: Biobase
+
+    ## Welcome to Bioconductor
+    ## 
+    ##     Vignettes contain introductory material; view with
+    ##     'browseVignettes()'. To cite Bioconductor, see
+    ##     'citation("Biobase")', and for packages 'citation("pkgname")'.
+
+    ## 
+    ## Attaching package: 'Biobase'
+
+    ## The following object is masked from 'package:MatrixGenerics':
+    ## 
+    ##     rowMedians
+
+    ## The following objects are masked from 'package:matrixStats':
+    ## 
+    ##     anyMissing, rowMedians
+
+``` r
+set.seed(1)
+M <- matrix(c(sample(0:10, 1000, TRUE),
+              sample(50:60, 1000, TRUE),
+              sample(0:10, 1000, TRUE),
+              sample(20:30, 1000, TRUE))
+            , nrow = 1000, byrow = T)
+Cov <- M + matrix(sample(50:60, 4000, TRUE), nrow = 1000)
+  
+  
+bs <- BSseq(
+    chr = rep("chr1", 1000),
+    pos = seq_len(1000),
+    M = M,
+    Cov = Cov,
+    sampleNames = colnames(M)
+  )
+
+res <- fuse.segment(bs)
+head(res$summary)
+```
+
+    ##    Segment  Chr Start  End CpGs Length       Beta Coherent
+    ## 1   chr1.1 chr1     1  250  250    250 0.08344157    FALSE
+    ## 2 chr1.251 chr1   251  500  250    250 0.50035855     TRUE
+    ## 3 chr1.501 chr1   501  750  250    250 0.08405464    FALSE
+    ## 4 chr1.751 chr1   751 1000  250    250 0.31483887     TRUE
+
+``` r
+library(methrix)
+```
+
+    ## Loading required package: data.table
+
+    ## 
+    ## Attaching package: 'data.table'
+
+    ## The following object is masked from 'package:SummarizedExperiment':
+    ## 
+    ##     shift
+
+    ## The following object is masked from 'package:GenomicRanges':
+    ## 
+    ##     shift
+
+    ## The following object is masked from 'package:IRanges':
+    ## 
+    ##     shift
+
+    ## The following objects are masked from 'package:S4Vectors':
+    ## 
+    ##     first, second
+
+``` r
+data(methrix_data, package = "methrix")
+
+res <- fuse.segment(methrix_data)
+head(res$summary)
+```
+
+    ##          Segment   Chr    Start      End CpGs   Length       Beta Coherent
+    ## 1 chr21.27866423 chr21 27866423 47286854   82 19420432 0.09796720     TRUE
+    ## 2 chr21.47286962 chr21 47286962 47517454  118   230493 0.16972343     TRUE
+    ## 3 chr21.47517456 chr21 47517456 47520741  211     3286 0.05453577     TRUE
+    ## 4 chr21.47536415 chr21 47536415 47540455  129     4041 0.11761019     TRUE
+    ## 5 chr22.45083239 chr22 45083239 49007398  203  3924160 0.13991860     TRUE
+
 ## Apply FUSE through separate steps
 
 If the intermediate outputs of the method are relevant, then the
@@ -134,17 +306,20 @@ This performs a hierarchical clustering of closest neighbors, and
 outputs a clustering tree.
 
 ``` r
-tree <- fuse.cluster(as.matrix(K0), as.matrix(K1))
+tree <- fuse.cluster(as.matrix(K0), 
+                     as.matrix(K1),
+                     chr = sub("\\..*$", "", rownames(K0)), 
+                     pos = as.integer(sub("^.*\\.", "", rownames(K0))))
 head(tree)
 ```
 
     ##          m1     m2 logl_tot logl_merge genomic_dist
-    ## [1,] -45579 -45580 10.65993   10.65993      1.14483
-    ## [2,] -49658 -49659 12.57786   12.57786      1.14483
-    ## [3,] -57737 -57738 12.62932   12.62932      1.14483
-    ## [4,] -46190 -46191 12.70708   12.70708      1.14483
-    ## [5,] -23937 -23938 16.63625   16.63625      1.14483
-    ## [6,] -88318 -88319 16.75105   16.75105      1.14483
+    ## [1,] -45579 -45580 10.65993   10.65993     1.144830
+    ## [2,] -57737 -57738 12.62932   12.62932     1.144830
+    ## [3,] -46190 -46191 12.70708   12.70708     1.176616
+    ## [4,] -49658 -49659 12.57786   12.57786     1.877867
+    ## [5,] -23937 -23938 16.63625   16.63625     1.144830
+    ## [6,] -41560 -41561 17.26477   17.26477     1.146329
 
 The clustering ‘tree’ contains the following columns:
 
@@ -170,7 +345,7 @@ optimal_num_of_segments <- number.of.clusters(tree, ncol(K0), 'BIC')
 optimal_num_of_segments
 ```
 
-    ## [1] 9027
+    ## [1] 9030
 
 The tree can then be cut using ‘fuse.cut.tree()’
 
@@ -247,13 +422,13 @@ The outputs are identical.
 identical(segment_result$summary, result$summary)
 ```
 
-    ## [1] FALSE
+    ## [1] TRUE
 
 ``` r
 identical(segment_result$betas_per_segment, result$betas_per_segment)
 ```
 
-    ## [1] FALSE
+    ## [1] TRUE
 
 ## Plotting
 

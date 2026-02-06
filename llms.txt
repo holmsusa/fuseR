@@ -18,16 +18,24 @@ data** through hierarchical clustering.
 
 ### From GitHub (Development Version)
 
+Either using remotes: (recommended)
+
 ``` r
-# Install devtools or remotes if needed
-install.packages("devtools")
-# or
+# Install remotes if needed
 install.packages("remotes")
 
 # Install fuseR from GitHub
-devtools::install_github("holmsusa/fuseR")
-# or
 remotes::install_github("holmsusa/fuseR")
+```
+
+or using devtools:
+
+``` r
+# Install devtools if needed
+install.packages("devtools")
+
+# Install fuseR from GitHub
+devtools::install_github("holmsusa/fuseR")
 ```
 
 ## System Requirements
@@ -40,6 +48,29 @@ You may need platform-specific tools:
 - macOS: Xcode Command Line Tools (xcode-select –install)
 - Linux: build-essential
 - Windows: Rtools
+
+## Supported input types
+
+[`fuse.segment()`](https://holmsusa.github.io/fuseR/reference/fuse.segment.md)
+supports the following input formats:
+
+- **Matrix input**
+  - Unmethylated counts (`K0`)
+  - Methylated counts (`K1`)
+  - Explicit chromosome (`chr`) and position (`pos`) vectors
+- **BSseq objects** (Bioconductor)
+  - Counts and genomic coordinates are extracted automatically
+  - Requires **bsseq** package
+- **methrix objects** (Bioconductor)
+  - Supports large datasets via `DelayedMatrix`
+  - Counts and genomic coordinates are extracted automatically
+  - Requires **methrix** and **DelayedArray** packages
+
+Install needed packages with
+
+``` r
+BiocManager::install(c("bsseq", "methrix". "DelayedArray"))
+```
 
 ## Quick Example
 

@@ -6,26 +6,64 @@ counts.
 ## Usage
 
 ``` r
-fuse.cluster(K0, K1, chr = NULL, pos = NULL)
+fuse.cluster(x, ...)
+
+# Default S3 method
+fuse.cluster(x, K1, chr = NULL, pos = NULL, ...)
+
+# S3 method for class 'BSseq'
+fuse.cluster(x, ...)
+
+# S3 method for class 'methrix'
+fuse.cluster(x, ...)
 ```
 
 ## Arguments
 
-- K0:
+- x:
 
-  Integer or numeric matrix with unmethylated counts
+  Input object. One of:
+
+  matrix
+
+  :   Unmethylated count matrix (K0).
+
+  BSseq
+
+  :   A `BSseq` object.
+
+  methrix
+
+  :   A `methrix` object.
+
+- ...:
+
+  K1 Integer or numeric matrix with methylated counts \#' @param ...
+  Additional arguments depending on input type:
+
+  K1
+
+  :   Methylated count matrix (required if `x` is a matrix).
+
+  chr
+
+  :   (Optinal) Chromosome labels, one per CpG (matrix input only).
+
+  pos
+
+  :   (Optional) positions, one per CpG (matrix input only).
 
 - K1:
 
-  Integer or numeric matrix with methylated counts
+  Methylated count matrix
 
 - chr:
 
-  (Optional) Integer vector with chromosome info
+  Optional chromosome vector
 
 - pos:
 
-  (Optional) Integer vector with genomic coordinate positions
+  Optional position vector
 
 ## Value
 

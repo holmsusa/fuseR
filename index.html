@@ -69,16 +69,20 @@
 <div class="section level3">
 <h3 id="from-github-development-version">From GitHub (Development Version)<a class="anchor" aria-label="anchor" href="#from-github-development-version"></a>
 </h3>
+<p>Either using remotes: (recommended)</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Install devtools or remotes if needed</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"devtools"</span><span class="op">)</span></span>
-<span><span class="co"># or</span></span>
+<code class="sourceCode R"><span><span class="co"># Install remotes if needed</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"remotes"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Install fuseR from GitHub</span></span>
-<span><span class="fu">devtools</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"holmsusa/fuseR"</span><span class="op">)</span></span>
-<span><span class="co"># or</span></span>
 <span><span class="fu">remotes</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"holmsusa/fuseR"</span><span class="op">)</span></span></code></pre></div>
+<p>or using devtools:</p>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Install devtools if needed</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"devtools"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Install fuseR from GitHub</span></span>
+<span><span class="fu">devtools</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"holmsusa/fuseR"</span><span class="op">)</span></span></code></pre></div>
 </div>
 </div>
 <div class="section level2">
@@ -96,9 +100,42 @@
 </ul>
 </div>
 <div class="section level2">
+<h2 id="supported-input-types">Supported input types<a class="anchor" aria-label="anchor" href="#supported-input-types"></a>
+</h2>
+<p><code><a href="reference/fuse.segment.html">fuse.segment()</a></code> supports the following input formats:</p>
+<ul>
+<li>
+<strong>Matrix input</strong>
+<ul>
+<li>Unmethylated counts (<code>K0</code>)</li>
+<li>Methylated counts (<code>K1</code>)</li>
+<li>Explicit chromosome (<code>chr</code>) and position (<code>pos</code>) vectors</li>
+</ul>
+</li>
+<li>
+<strong>BSseq objects</strong> (Bioconductor)
+<ul>
+<li>Counts and genomic coordinates are extracted automatically</li>
+<li>Requires <strong>bsseq</strong> package</li>
+</ul>
+</li>
+<li>
+<strong>methrix objects</strong> (Bioconductor)
+<ul>
+<li>Supports large datasets via <code>DelayedMatrix</code>
+</li>
+<li>Counts and genomic coordinates are extracted automatically</li>
+<li>Requires <strong>methrix</strong> and <strong>DelayedArray</strong> packages</li>
+</ul>
+</li>
+</ul>
+<p>Install needed packages with</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a>BiocManager<span class="sc">::</span><span class="fu">install</span>(<span class="fu">c</span>(<span class="st">"bsseq"</span>, <span class="st">"methrix"</span>. <span class="st">"DelayedArray"</span>))</span></code></pre></div>
+</div>
+<div class="section level2">
 <h2 id="quick-example">Quick Example<a class="anchor" aria-label="anchor" href="#quick-example"></a>
 </h2>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://holmsusa.github.io/fuseR/">fuseR</a></span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1234</span><span class="op">)</span></span>
 <span></span>
