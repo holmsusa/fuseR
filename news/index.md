@@ -12,6 +12,8 @@
   support for `BSseq` and `methrix` objects
 - Unified S3 API: `fuse.cluster(K0, K1)` and `fuse.segment(K0, K1)` now
   supported
+- [`fuse.cluster()`](https://holmsusa.github.io/fuseR/reference/fuse.cluster.md)
+  now returns object, compatible with other packages
 
 ### Improvements
 

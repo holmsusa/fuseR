@@ -183,31 +183,46 @@ pipeline can also be applied by calling each of the functions
 
 In the first step, ‘fuse.cluster()’ is applied on the count matrices.
 This performs a hierarchical clustering of closest neighbors, and
-outputs a clustering tree.
+outputs a clustering tree of class .
 
 ``` r
 tree <- fuse.cluster(as.matrix(K0), 
                      as.matrix(K1),
                      chr = sub("\\..*$", "", rownames(K0)), 
                      pos = as.integer(sub("^.*\\.", "", rownames(K0))))
-head(tree)
+names(tree)
 ```
 
-    ##          m1     m2 logl_tot logl_merge genomic_dist
-    ## [1,] -45579 -45580 10.65993   10.65993     1.144830
-    ## [2,] -57737 -57738 12.62932   12.62932     1.144830
-    ## [3,] -46190 -46191 12.70708   12.70708     1.176616
-    ## [4,] -49658 -49659 12.57786   12.57786     1.877867
-    ## [5,] -23937 -23938 16.63625   16.63625     1.144830
-    ## [6,] -41560 -41561 17.26477   17.26477     1.146329
+    ## [1] "merge"       "height"      "order"       "labels"      "call"       
+    ## [6] "method"      "dist.method"
 
-The clustering ‘tree’ contains the following columns:
+``` r
+head(tree$merge)
+```
 
-- ‘m1’: the label of the first merged point
-- ‘m2’: the label of the second merged point
-- ‘logl_tot’: Change in total log-likelihood for forming this merge
-- ‘logl_merge’: Total cost of the points in this formed cluster
-- ‘genomic_dist’: Distance penalty for this merge
+    ##        [,1]   [,2]
+    ## [1,] -45579 -45580
+    ## [2,] -57737 -57738
+    ## [3,] -46190 -46191
+    ## [4,] -49658 -49659
+    ## [5,] -23937 -23938
+    ## [6,] -41560 -41561
+
+``` r
+head(tree$height)
+```
+
+    ## [1] 10.65993 23.28925 35.99633 48.57419 65.21045 82.47522
+
+The clustering tree contains the following elements:
+
+- ‘merge’: the labels of the merged points
+- ‘height’: The total log-likelihood for forming this merge
+- ‘order’: Same order as original, since clustering is done in 1D
+- ‘labels’: Labels of form
+- ‘call’:
+- ‘method’:
+- ‘dist.method’:
 
 ### 2. Cutting the tree
 
@@ -218,16 +233,14 @@ either the Bayesian Information Criterion (BIC, default), or the Akaike
 Information Criterion (AIC).
 
 ``` r
-# Need the total likelihood per model, which is sum of likelihood changes
-tree[,3] <- cumsum(tree[,3])
-
 optimal_num_of_segments <- number.of.clusters(tree, ncol(K0), 'BIC')
 optimal_num_of_segments
 ```
 
     ## [1] 9030
 
-The tree can then be cut using ‘fuse.cut.tree()’
+The tree can then be cut using ‘fuse.cut.tree()’, (or ‘cutree’ from
+package ).
 
 ``` r
 segments <- fuse.cut.tree(tree, optimal_num_of_segments)

@@ -14,7 +14,7 @@ number.of.clusters(tree, n, method = c("BIC", "AIC"))
 
 - tree:
 
-  Clustering tree (matrix or data.frame).
+  Clustering tree of class `hclust`.
 
 - n:
 
@@ -42,7 +42,6 @@ K1 <- matrix(
   nrow = 100, byrow = TRUE
 )
 tree <- fuse.cluster(K0, K1)
-tree[,3] <- cumsum(tree[,3]) # Total likelihood of model
 k <- number.of.clusters(tree, ncol(K0), 'BIC')
 k
 #> [1] 4
