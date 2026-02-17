@@ -69,7 +69,7 @@ supports the following input formats:
 Install needed packages with
 
 ``` r
-BiocManager::install(c("bsseq", "methrix". "DelayedArray"))
+BiocManager::install(c("bsseq", "methrix", "DelayedArray"))
 ```
 
 ## Quick Example
