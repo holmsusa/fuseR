@@ -51,7 +51,7 @@ You may need platform-specific tools:
 
 ## Supported input types
 
-[`fuse.segment()`](https://holmsusa.github.io/fuseR/reference/fuse.segment.md)
+[`fuse.segment()`](https://holmsusa.github.io/methFuse/reference/fuse.segment.md)
 supports the following input formats:
 
 - **Matrix input**
@@ -108,7 +108,7 @@ Check out a **full example workflow** in the
 ## License
 
 This package is licensed under the MIT License. See
-[LICENSE](https://holmsusa.github.io/fuseR/LICENSE) for details.
+[LICENSE](https://holmsusa.github.io/methFuse/LICENSE) for details.
 
 ## Author
 

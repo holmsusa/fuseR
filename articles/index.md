@@ -3,4 +3,4 @@
 ### All vignettes
 
 - [Example workflow using
-  FUSE](https://holmsusa.github.io/fuseR/articles/example.md):
+  FUSE](https://holmsusa.github.io/methFuse/articles/example.md):
