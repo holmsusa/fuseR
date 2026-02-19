@@ -1,7 +1,7 @@
-# ![fuseR hexagon](reference/figures/fuse_logo.svg) fuseR
+# ![methfuse hexagon](reference/figures/fuse_logo.svg) methFuse
 
-**fuseR** implements FUSE: **FUnctional SEgmentation of DNA methylation
-data** through hierarchical clustering.
+**methFuse** implements FUSE: **FUnctional SEgmentation of DNA
+methylation data** through hierarchical clustering.
 
 ------------------------------------------------------------------------
 
@@ -25,7 +25,7 @@ Either using remotes: (recommended)
 install.packages("remotes")
 
 # Install fuseR from GitHub
-remotes::install_github("holmsusa/fuseR")
+remotes::install_github("holmsusa/methFuse")
 ```
 
 or using devtools:
@@ -35,7 +35,7 @@ or using devtools:
 install.packages("devtools")
 
 # Install fuseR from GitHub
-devtools::install_github("holmsusa/fuseR")
+devtools::install_github("holmsusa/methFuse")
 ```
 
 ## System Requirements
@@ -103,7 +103,7 @@ head(segment_result$betas_per_segment)
 ```
 
 Check out a **full example workflow** in the
-[vignette](https://holmsusa.github.io/fuseR/articles/example.html).
+[vignette](https://holmsusa.github.io/methFuse/articles/example.html).
 
 ## License
 

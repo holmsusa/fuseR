@@ -7,13 +7,14 @@
 
 ## Citation
 
-Holmström S (2026). *fuseR: Functional segmentation of the methylome*. R
-package version 1.1.0, <https://holmsusa.github.io/fuseR/>.
+Holmström S (2026). *methFuse: Functional Segmentation of the
+Methylome*. R package version 1.1.0,
+<https://holmsusa.github.io/methFuse/>.
 
     @Manual{,
-      title = {fuseR: Functional segmentation of the methylome},
+      title = {methFuse: Functional Segmentation of the Methylome},
       author = {Susanna Holmström},
       year = {2026},
       note = {R package version 1.1.0},
-      url = {https://holmsusa.github.io/fuseR/},
+      url = {https://holmsusa.github.io/methFuse/},
     }

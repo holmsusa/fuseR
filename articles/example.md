@@ -1,7 +1,7 @@
 # Example workflow using FUSE
 
 ``` r
-library(fuseR)
+library(methFuse)
 ```
 
 ### Reading in data
@@ -16,8 +16,8 @@ This is a dummy data set consisting of manipulated counts of the 100 000
 first CpG sites in chromosome 20.
 
 ``` r
-k0_file <- system.file("examples/k0.tsv.gz", package = "fuseR")
-k1_file <- system.file("examples/k1.tsv.gz", package = "fuseR")
+k0_file <- system.file("examples/k0.tsv.gz", package = "methFuse")
+k1_file <- system.file("examples/k1.tsv.gz", package = "methFuse")
 
 K0 <- read.table(k0_file, header = TRUE)
 K1 <- read.table(k1_file, header = TRUE)
