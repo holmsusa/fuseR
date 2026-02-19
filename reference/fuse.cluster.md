@@ -42,15 +42,15 @@ fuse.cluster(x, ...)
 
 - K1:
 
-  Methylated count matrix
+  Methylated count matrix (if x is matrix).
 
 - chr:
 
-  Optional chromosome vector
+  Chromosome labels (if x is matrix).
 
 - pos:
 
-  Optional position vector
+  Genomic positions (if x is matrix.
 
 ## Value
 

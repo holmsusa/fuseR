@@ -36,11 +36,11 @@ fuse.summary(K0, K1, chr, pos, segments)
 
 ## Value
 
-A list with two elements:
+A list with four elements:
 
 - summary:
 
-  A data frame with one row per segment and columns:
+  A data frame with one row per segment and the following columns:
 
 - betas_per_segment:
 

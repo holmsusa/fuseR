@@ -38,43 +38,27 @@ fuse.segment(x, method = c("BIC", "AIC"), ...)
 
 - ...:
 
-  Additional arguments depending on input type:
-
-  K1
-
-  :   Methylated count matrix (required if `x` is a matrix).
-
-  chr
-
-  :   Chromosome labels, one per CpG (matrix input only).
-
-  pos
-
-  :   Genomic positions, one per CpG (matrix input only).
-
-  method
-
-  :   Information criterion for model selection: `"BIC"` (default) or
-      `"AIC"`.
-
-  For internal use, `x` corresponds to the unmethylated count matrix
-  (`K0`).
+  Additional arguments (matrix input only)
 
 - K1:
 
-  Methylated count matrix (required if `x` is a matrix)
+  Methylated count matrix (if x is matrix).
 
 - chr:
 
-  Chromosome labels, one per CpG (matrix input only)
+  Chromosome labels (if x is matrix).
 
 - pos:
 
-  Genomic positions, one per CpG (matrix input only)
+  Genomic positions (if x is matrix.
 
 - method:
 
-  Information criterion for model selection: "BIC" (default) or "AIC"
+  Information criterion for model selection: `"BIC"` (default) or
+  `"AIC"`.
+
+  For internal use, `x` corresponds to the unmethylated count matrix
+  (`K0`).
 
 ## Value
 

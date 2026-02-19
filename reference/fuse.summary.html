@@ -80,18 +80,18 @@ Result can be visualized using plot(result).</p>
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>A list with two elements:</p><dl><dt>summary</dt>
-<dd><p>A data frame with one row per segment and columns:</p></dd>
+    <p>A list with four elements:</p><dl><dt>summary</dt>
+<dd><p>A data frame with one row per segment and the following columns:</p></dd>
 
 
-
-
-
-
-
-
-
-
+Segment: Segment ID
+Chr: Chromosome
+Start: Start genomic coordinate
+End: End genomic coordinate
+CpGs: Number of CpGs in the segment
+Length: Genomic length (End - Start + 1)
+Beta: Average methylation across samples and CpGs
+Coherent: Logical indicator (TRUE if segment is coherently methylated, else FALSE)
 
 <dt>betas_per_segment</dt>
 <dd><p>Matrix of per-sample methylation estimates for each segment

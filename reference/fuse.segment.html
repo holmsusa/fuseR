@@ -76,37 +76,25 @@ and genomic segment summarization.</p>
 
 
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
-<dd><p>Additional arguments depending on input type:</p><dl><dt>K1</dt>
-<dd><p>Methylated count matrix (required if <code>x</code> is a matrix).</p></dd>
-
-<dt>chr</dt>
-<dd><p>Chromosome labels, one per CpG (matrix input only).</p></dd>
-
-<dt>pos</dt>
-<dd><p>Genomic positions, one per CpG (matrix input only).</p></dd>
-
-<dt>method</dt>
-<dd><p>Information criterion for model selection:
-<code>"BIC"</code> (default) or <code>"AIC"</code>.</p></dd>
-
-
-</dl><p>For internal use, <code>x</code> corresponds to the unmethylated count matrix (<code>K0</code>).</p></dd>
+<dd><p>Additional arguments (matrix input only)</p></dd>
 
 
 <dt id="arg-k-">K1<a class="anchor" aria-label="anchor" href="#arg-k-"></a></dt>
-<dd><p>Methylated count matrix (required if <code>x</code> is a matrix)</p></dd>
+<dd><p>Methylated count matrix (if x is matrix).</p></dd>
 
 
 <dt id="arg-chr">chr<a class="anchor" aria-label="anchor" href="#arg-chr"></a></dt>
-<dd><p>Chromosome labels, one per CpG (matrix input only)</p></dd>
+<dd><p>Chromosome labels (if x is matrix).</p></dd>
 
 
 <dt id="arg-pos">pos<a class="anchor" aria-label="anchor" href="#arg-pos"></a></dt>
-<dd><p>Genomic positions, one per CpG (matrix input only)</p></dd>
+<dd><p>Genomic positions (if x is matrix.</p></dd>
 
 
 <dt id="arg-method">method<a class="anchor" aria-label="anchor" href="#arg-method"></a></dt>
-<dd><p>Information criterion for model selection: "BIC" (default) or "AIC"</p></dd>
+<dd><p>Information criterion for model selection:
+<code>"BIC"</code> (default) or <code>"AIC"</code>.</p>
+<p>For internal use, <code>x</code> corresponds to the unmethylated count matrix (<code>K0</code>).</p></dd>
 
 </dl></div>
     <div class="section level2">
